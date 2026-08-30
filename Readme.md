@@ -19,7 +19,7 @@ DPW-2026-Syeril-Azalea-Rivera/
 │
 ├── jobsheet-01/
 ├── jobsheet-02/
-├── obsheet-03/
+├── Jobsheet-03/
 ├── dst...
 │
 └── README.md
