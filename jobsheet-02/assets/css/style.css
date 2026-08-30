@@ -133,6 +133,11 @@ td button:first-of-type {
     color: #fff;
 }
 
+td button:nth-of-type(2) {
+    background-color: #FF9137;
+    color: #fff;
+}
+
 td button:last-of-type {
     background-color: #d9534f;
     color: #fff;
