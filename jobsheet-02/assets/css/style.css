@@ -137,3 +137,37 @@ td button:last-of-type {
     background-color: #d9534f;
     color: #fff;
 }
+
+/* Form */
+form p {
+    margin-bottom: 1rem;
+}
+
+form label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+    color: #444;
+}
+
+form input, form select {
+    width: 100%;
+    max-width: 400px;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid #cdd4da;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+form button[type="submit"] {
+    background-color: #1d5b8a;
+    color: #fff;
+    padding: 0.6rem 1.5rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+form button[type="submit"]:hover {
+    background-color: #164869;
+}
