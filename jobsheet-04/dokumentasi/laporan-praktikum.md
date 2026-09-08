@@ -7,6 +7,43 @@
 | Program Studi  | D-IV - Teknik Informatika  |
 | Mata Kuliah    | Desain dan Pemrograman Web |
 
+# User Flow
+## 1. Flow Login
+```text
+[Buka Halaman Login] -> [Masukkan Email/Username & Password] -> [Klik Login]
+-> [Validasi Kredensial]
+   -> (jika salah) -> [Tampilkan Pesan Error] -> [Kembali ke Form Login]
+   -> (jika benar) -> [Arahkan ke Dashboard Petugas] -> [Selesai]
+```
+
+## 2. Flow Peminjaman
+```text
+[Petugas Login] -> [Dashboard] -> [Pilih Menu Peminjaman] -> [Pilih Anggota] -> [Pilih Buku]
+-> [Cek Stok & Validasi Duplikasi]
+   -> (jika stok = 0) -> [Tampilkan "Stok Habis"] -> [Gagal, pilih buku lain]
+   -> (jika anggota masih pinjam buku yang sama) -> [Tampilkan "Buku ini masih dipinjam anggota"] -> [Gagal]
+   -> (jika lolos kedua cek) -> [Isi Tanggal Pinjam (auto hari ini)] -> [Klik Simpan]
+-> [Kurangi Stok Buku 1] -> [Simpan Transaksi] -> [Kembali ke Dashboard]
+```
+
+## 3. Flow Pengembalian
+```text
+[Petugas Login] -> [Dashboard] -> [Pilih Menu Pengembalian] -> [Cari Transaksi Aktif (nama anggota/judul buku)]
+-> [Pilih Transaksi yang Ditemukan] -> [Cek Status Transaksi]
+   -> (jika status sudah "Dikembalikan") -> [Tampilkan "Transaksi sudah selesai"] -> [Selesai (tidak bisa proses ulang)]
+   -> (jika status "Dipinjam") -> [Cek Tanggal Jatuh Tempo]
+       -> (jika melewati jatuh tempo) -> [Tampilkan Status "Terlambat"] -> [Hitung Denda/Keterlambatan]
+       -> (jika tidak melewati) -> [Lanjutkan]
+-> [Klik Kembalikan Buku] -> [Status menjadi "Dikembalikan"] -> [Tambah Stok Buku 1] -> [Kembali ke Dashboard]
+```
+
+## 4. Flow Riwayat
+```text
+[Petugas Login] -> [Dashboard] -> [Pilih Menu Riwayat] -> [Tampilkan Daftar Semua Transaksi] 
+-> [Opsional: Cari berdasarkan nama/judul] atau [Filter Status (Semua/Dipinjam/Dikembalikan/Terlambat)] 
+-> [Sistem Perbarui Tampilan Daftar] -> [Pilih Salah Satu Transaksi] -> [Lihat Detail Peminjaman] -> [Selesai]
+```
+
 # 1. Wireframe Login
 
 ```text
