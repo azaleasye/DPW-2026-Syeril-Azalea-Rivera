@@ -216,6 +216,10 @@ header nav ul {
     flex-direction: column;
 }
 
+/* table responsive */
+.table-responsive {
+    overflow-x: auto;
+}
 
 /* footer */
 footer {

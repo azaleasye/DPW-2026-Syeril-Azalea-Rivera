@@ -145,3 +145,18 @@ header nav ul {
     gap: 0.75rem;
 }
 ```
+
+### 04. CSS Table Responsive
+1. Menambahkan CSS Table Responsive
+Menambahkan satu properti untuk menampilkan table sesuai lebar aslinya di layar hp, namun dengan pendekatan scroll ke samping agar pengguna tinggal geser (swipe di HP, atau scroll horizontal di trackpad/mouse) untuk melihat kolom yang belum terlihat.
+
+```css
+.table-responsive {
+    overflow-x: auto;
+}
+```
+
+overflow-x mengatur perilaku konten yang melebihi lebar elemen, khusus arah horizontal (ada juga overflow-y untuk arah vertikal, dan overflow untuk keduanya sekaligus).
+
+Nilai auto berarti: browser hanya menampilkan scrollbar kalau memang dibutuhkan (isi di dalamnya melebihi lebar kotak). Kalau tabelnya cukup sempit untuk muat (misalnya di layar desktop lebar), tidak ada scrollbar yang muncul sama sekali — perilaku ini lebih ramah dibanding nilai scroll yang akan selalu menampilkan scrollbar meskipun tidak diperlukan.
+
