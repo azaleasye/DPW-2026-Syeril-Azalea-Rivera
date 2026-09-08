@@ -181,6 +181,19 @@ form button[type="submit"]:hover {
     background-color: #164869;
 }
 
+/* Hamburger Menu */
+.nav-toggle {
+    display: none;
+}
+
+.nav-toggle-label {
+    display: none;
+    font-size: 1.6rem;
+    color: #fff;
+    cursor: pointer;
+}
+
+
 /* footer */
 footer {
     text-align:center;
