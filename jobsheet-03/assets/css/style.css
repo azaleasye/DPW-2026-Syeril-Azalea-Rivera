@@ -221,6 +221,13 @@ header nav ul {
     overflow-x: auto;
 }
 
+/* breakpoint tablet */
+@media (max-width: 768px) {
+    main section:nth-of-type(2) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 /* footer */
 footer {
     text-align:center;

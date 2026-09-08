@@ -160,3 +160,15 @@ overflow-x mengatur perilaku konten yang melebihi lebar elemen, khusus arah hori
 
 Nilai auto berarti: browser hanya menampilkan scrollbar kalau memang dibutuhkan (isi di dalamnya melebihi lebar kotak). Kalau tabelnya cukup sempit untuk muat (misalnya di layar desktop lebar), tidak ada scrollbar yang muncul sama sekali — perilaku ini lebih ramah dibanding nilai scroll yang akan selalu menampilkan scrollbar meskipun tidak diperlukan.
 
+
+### 05. CSS Media Query
+@media digunakan untuk mengatur tampilan website berdasarkan ukuran layar. Pada CSS ini ada 2 breakpoint:
+ - ≤768px → Tablet
+ - ≤480px → Mobile/HP
+
+1. Breakpoint Tablet
+Perubahan:
+- Desktop: 3 kolom
+- Tablet: 2 kolom
+
+Card ketiga otomatis turun ke baris berikutnya.
