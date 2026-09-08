@@ -1,4 +1,4 @@
-# Laporan Praktikum Jobsheet 2
+# Laporan Praktikum Jobsheet 3
 
 ## Identitas 
 
@@ -14,7 +14,7 @@
 ```text
 DPW-2026-Syeril-Azalea-Rivera/
 │
-├── jobsheet-02/
+├── jobsheet-03/
 │   ├── anggota/
 │   │   ├── list.html
 │   │   └── tambah.html
