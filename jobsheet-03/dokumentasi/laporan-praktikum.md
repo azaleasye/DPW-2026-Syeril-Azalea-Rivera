@@ -172,3 +172,26 @@ Perubahan:
 - Tablet: 2 kolom
 
 Card ketiga otomatis turun ke baris berikutnya.
+
+2. Breakpoint Mobile
+- Card Statistik menjadi 1 kolom
+```css
+main section:nth-of-type(2) {
+    grid-template-columns: 1fr;
+}
+```
+
+| Ukuran Layar     | Jumlah Kolom |
+| ---------------- | ------------ |
+| Desktop (>768px) | 3 kolom      |
+| Tablet (≤768px)  | 2 kolom      |
+| Mobile (≤480px)  | 1 kolom      |
+
+- Input Form
+Input dan dropdown bisa menggunakan seluruh lebar layar HP agar lebih nyaman digunakan.
+```css
+form input,
+form select {
+    max-width: 100%;
+}
+```

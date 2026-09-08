@@ -181,6 +181,11 @@ form button[type="submit"]:hover {
     background-color: #164869;
 }
 
+/* table responsive */
+.table-responsive {
+    overflow-x: auto;
+}
+
 /* Hamburger Menu */
 .nav-toggle {
     display: none;
@@ -193,7 +198,16 @@ form button[type="submit"]:hover {
     cursor: pointer;
 }
 
-header {
+/* breakpoint tablet */
+@media (max-width: 768px) {
+    main section:nth-of-type(2) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* breakpoint mobile */
+@media (max-width: 768px) {
+    header {
     position: relative;
 }
 
@@ -216,16 +230,14 @@ header nav ul {
     flex-direction: column;
 }
 
-/* table responsive */
-.table-responsive {
-    overflow-x: auto;
+main section:nth-of-type(2) {
+    grid-template-columns: 1fr;
 }
 
-/* breakpoint tablet */
-@media (max-width: 768px) {
-    main section:nth-of-type(2) {
-        grid-template-columns: repeat(2, 1fr);
-    }
+form input,
+form select {
+    max-width: 100%;
+}
 }
 
 /* footer */
