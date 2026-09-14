@@ -34,6 +34,7 @@ Tiga bagian utama website:
 ### 1.3 Kenapa Script di Akhir <body>?
 Karena browser membaca elemen html dari atas ke bawah 
 
+
 ## 2. Perubahan File HTML
 Ada beberapa perubahan HTML agar JavaScript bisa menemukan dan mengatur elemen HTML.
 
@@ -80,3 +81,54 @@ Menambahkan class="button-hapus" agar document.querySelectorAll(".btn-hapus") di
 - Menambahkan id form tambah di (`buku/tambah.html` dan `anggota/tambah.html`)
 - id="form-tambah" di tag <form>-nya — sebelumnya (dokumentasi jobsheet-01) tag <form> tidak punya atribut apa pun.
 -  id ini adalah "kait" yang dicari document.getElementById("form-tambah") supaya JavaScript bisa memasang event listener submit untuk validasi.
+
+
+## 3. CSS Pendukung Fitur JavaScript
+### 3.1 Hamburger: dari `.nav-toggle` ke Tombol Asli
+1. Menghapus .nav-toggle di CSS Style
+   ```css
+   .nav-toggle {
+      display: none;
+   }
+   ```
+2. Menambah background dan border di CSS .nav-toggle-label
+Karena sekarang elemennya adalah`<button>`. Tombol HTML secara default punya latar abu-abu dan
+bingkai 3D bawaan browser. Tanpa dua baris ini, tombol hamburger akan terlihat seperti kotak abu-abu biasa.
+   ```css
+   .nav-toggle-label {
+      display: none;
+      font-size: 1.6rem;
+      color: #fff;
+      background: none;
+      border: none;
+      cursor: pointer;
+   }
+   ```
+3. Ubah .nav
+Sekarang selector-nya jauh lebih sederhana: **`header nav.nav-open`** —
+elemen `<nav>` di dalam `<header>` yang **punya class `nav-open`**.
+Tidak ada lagi pseudo-class atau sibling combinator sama sekali, karena
+status "menu terbuka" sekarang murni ditentukan oleh **ada atau
+tidaknya** class `nav-open` — dan yang menambah/menghapus class
+   ```css
+   header nav.nav-open {
+      display: block;
+   }
+   ```
+   
+### 3.2 Gaya Baru: Pesan Error Validasi
+1. Menambahkan css pesan error
+- `display: block;` 
+   memastikan pesan error tampil di **baris baru** sendiri, di bawah kotak input, bukan menempel sejajar di sampingnya
+- `color: #d9534f;` 
+   warna merah, sama persis dengan warna tombol Hapus yg menandakan "sesuatu yang perlu perhatian/tindakan" di seluruh aplikasi.
+- `font-size: 0.85rem;` dan `margin-top: 0.25rem;` 
+   teks sedikit lebih kecil dari input di atasnya, dengan jarak tipis supaya terlihat jelas
+   sebagai keterangan tambahan, bukan menyatu dengan input.
+
+### 3.3 Gaya Baru: Kolom Pencarian
+- `.search-box { margin-bottom: 1rem; }` 
+   memberi jarak antara kotak pencarian dan tabel di bawahnya.
+- `.search-box input` 
+   menata kotak input pencarian mirip gaya input form, karena
+   kolom pencarian memang tidak perlu selebar field form biasa.
