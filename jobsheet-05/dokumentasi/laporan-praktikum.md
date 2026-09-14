@@ -66,3 +66,9 @@ Perubahannya :
 - Menambahkan search box, dengan pola yang sama seperti form, namun value nya tidak disimpan.
 - Value dari searching hanya akan dibaca oleh JS setiap kali diketik pada bagian placeholder.
 - id="search-input" adalah "kait" yang dicari document.getElementById("search-input")
+
+### 2.3 Button Delete
+Menambahkan class="button-hapus" agar document.querySelectorAll(".btn-hapus") di app.js bisa menemukan semua tombol Hapus sekaligus di satu halaman.
+```html
+<button type="button" class="btn-hapus">Hapus</button>
+```
