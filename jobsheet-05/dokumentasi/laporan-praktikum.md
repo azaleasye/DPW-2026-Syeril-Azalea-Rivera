@@ -132,3 +132,76 @@ tidaknya** class `nav-open` — dan yang menambah/menghapus class
 - `.search-box input` 
    menata kotak input pencarian mirip gaya input form, karena
    kolom pencarian memang tidak perlu selebar field form biasa.
+
+## 4. JS: Menu Hamburger
+Fungsi pertama di `app.js`, dan yang paling sederhana — cocok jadi titik
+awal belajar membaca kode JavaScript.
+
+```js
+function initNavToggle() {
+    const toggleBtn = document.getElementById("nav-toggle-btn");
+    const nav = document.querySelector("header nav");
+    if (!toggleBtn || !nav) return;
+
+    toggleBtn.addEventListener("click", function () {
+        nav.classList.toggle("nav-open");
+    });
+}
+```
+
+1. Mengambil Dua Elemen yang Dibutuhkan
+- `const` 
+   untuk mendeklarasikan sebuah **variabel**
+   (tempat menyimpan nilai) yang nilainya **tidak akan diganti** lagi
+   setelah didefinisikan.
+- `toggleBtn` 
+   diisi dengan tombol hamburger `id="nav-toggle-btn"`
+- `nav` 
+   diisi dengan elemen `<nav>` yang berada di dalam `<header>` dan memakai selector CSS `"header nav"`
+
+2. Penjaga Keamanan (Guard Clause)
+- Tanda seru `!` 
+   di depan sebuah nilai berarti **kebalikan/negasi**
+   `!toggleBtn` bernilai benar (*true*) kalau `toggleBtn` adalah `null`
+   (tidak ditemukan elemennya).
+- `||` berarti **atau** 
+   kondisi ini benar kalau **salah satu saja** dari `toggleBtn` atau `nav` tidak ditemukan.
+- Kalau kondisi ini benar, `return;` 
+   menghentikan fungsi sebelum baris berikutnya (`toggleBtn.addEventListener(...)`) sempat dijalankan dan
+   mencegah error "Cannot read properties of null" yang akan muncul jika mencoba memanggil `.addEventListener` pada nilai `null`.
+
+3. Memasang Event Listener
+- `toggleBtn.addEventListener("click", ...)` 
+   "setiap kali tombol ini diklik, jalankan fungsi berikut."
+- **`nav.classList`** 
+   adalah objek yang mewakili **daftar semua class** yang dimiliki elemen `nav` saat ini (mirip atribut `class="..."` di
+    HTML, tapi dalam bentuk yang bisa diprogram).
+- **`.toggle("nav-open")`** 
+   adalah method yang **membalik status** satu class tertentu:
+   - Kalau elemen `nav` **belum** punya class `nav-open` → class itu
+      **ditambahkan**.
+   - Kalau elemen `nav` **sudah** punya class `nav-open` → class itu
+      **dihapus**.
+
+4. Menghubungkan Kembali ke CSS
+
+```css
+header nav.nav-open {
+    display: block;
+}
+```
+
+Alur lengkapnya sekarang:
+
+1. Pengguna mengklik tombol hamburger (`#nav-toggle-btn`).
+2. Event listener `click` di [§4.4](#44-memasang-event-listener) terpicu.
+3. `nav.classList.toggle("nav-open")` menambahkan class `nav-open` ke
+   elemen `<nav>`.
+4. CSS `header nav.nav-open { display: block; }` otomatis berlaku
+   karena elemen `<nav>` sekarang cocok dengan selector itu → menu
+   **muncul**.
+5. Klik tombol sekali lagi → `classList.toggle()` **menghapus** class
+   `nav-open` → elemen `<nav>` tidak lagi cocok dengan selector CSS
+   tadi → menu kembali ke `display: none` dari gaya dasarnya → menu
+   **tersembunyi lagi**.
+
