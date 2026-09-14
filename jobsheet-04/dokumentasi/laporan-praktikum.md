@@ -189,3 +189,69 @@
 +----------------------------------------------------------------------------------+
 ```
 
+# Latihan
+
+## 1. Wireframe Registrasi Anggota
+**Aktor: Tamu**
+
+Halaman ini digunakan oleh pengunjung yang belum menjadi anggota perpustakaan dan ingin melakukan pendaftaran.
+
+```text
++----------------------------------------------------------------------------------+
+| SIMPUS-Mini                                               [ Login Petugas ]      |
+|----------------------------------------------------------------------------------|
+|                                                                                  |
+|                        REGISTRASI ANGGOTA BARU                                   |
+|                                                                                  |
+|  Silakan isi data berikut untuk mendaftar sebagai anggota perpustakaan.          |
+|                                                                                  |
+|  Nama Lengkap                                                                   |
+|  +------------------------------------------------------------+                  |
+|  |                                                            |                  |
+|  +------------------------------------------------------------+                  |
+|                                                                                  |
+|  Alamat                                                                        |
+|  +------------------------------------------------------------+                  |
+|  |                                                            |                  |
+|  +------------------------------------------------------------+                  |
+|                                                                                  |
+|  Nomor HP                                                                      |
+|  +------------------------------------------------------------+                  |
+|  |                                                            |                  |
+|  +------------------------------------------------------------+                  |
+|                                                                                  |
+|  Email                                                                         |
+|  +------------------------------------------------------------+                  |
+|  |                                                            |                  |
+|  +------------------------------------------------------------+                  |
+|                                                                                  |
+|  [ Batal ]                              [ Kirim Pendaftaran ]                  |
+|                                                                                  |
++----------------------------------------------------------------------------------+
+| © 2026 SIMPUS-Mini                                                               |
++----------------------------------------------------------------------------------+
+```
+## 2. Edge Case
+1. Stok Buku Habis
+
+Situasi:
+
+Petugas memilih buku dengan stok 0.
+
+Penanganan:
+
+Tombol peminjaman tidak dapat diproses.
+Sistem menampilkan pesan "Buku tidak tersedia."
+Petugas diminta memilih buku lain.
+
+2. Data Anggota Tidak Ditemukan
+
+Situasi:
+
+Petugas mencari nomor anggota yang tidak terdaftar.
+
+Penanganan:
+
+Sistem menampilkan pesan "Anggota tidak ditemukan."
+Petugas dapat melakukan pencarian ulang.
+Petugas dapat menambahkan anggota baru jika diperlukan.
