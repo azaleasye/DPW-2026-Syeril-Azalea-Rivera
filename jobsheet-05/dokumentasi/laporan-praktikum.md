@@ -240,3 +240,44 @@ const nama = row ? row.querySelector("td")?.textContent : "data ini";
     kode di dalam `if` hanya dijalankan kalau **kedua** kondisi benar: pengguna menekan OK (`yakin` bernilai`true`) **dan** baris `row` memang ditemukan.
 - **`row.remove()`** 
    method DOM yang menghapus elemen itu **dari tampilan halaman** secara langsung — baris tabel itu akan lenyap dari layar seketika, tanpa perlu me-reload halaman.
+
+## 6. JS: Filter Tabel Real-Time
+Fungsi ini menghubungkan kolom pencarian baru dengan tabel di bawahnya.
+
+1. Mengambil Kotak Input dan Tabelnya
+- `input` 
+   kotak pencarian, dicari lewat `id="search-input"`
+- `table` 
+   dicari dengan selector `".table-responsive table"`,
+   descendant selector yang mengambil elemen `<table>` di dalam `<div
+   class="table-responsive">` 
+- Guard clause `if (!input || !table) return;` 
+   memastikan fungsi ini aman dipanggil di halaman mana pun (termasuk
+   Beranda yang tidak punya kolom pencarian maupun tabel sama sekali).
+
+2. Event `keyup`: Bereaksi Setiap Ketikan
+event `keyup` terjadi setiap kali sebuah tombol keyboard **dilepas** (setelah ditekan) saat fokus berada di elemen `input`.
+
+3. Mengambil Kata Kunci Pencarian
+- **`input.value`**  
+   nilai/teks yang **sedang** diketik di dalam kotak input saat ini (berbeda dengan `placeholder` yang hanya teks contoh, bukan nilai sungguhan).
+- **`.toLowerCase()`**  
+   mengubah semua huruf jadi huruf kecil. Ini penting supaya pencarian **tidak peka huruf besar/kecil** (*case-insensitive*) — mengetik "laskar" tetap menemukan "Laskar Pelangi" meskipun huruf "L"-nya besar di data aslinya.
+
+5. Mengulang Setiap Baris Tabel
+- `table.querySelectorAll("tbody tr")` — 
+   mengambil **semua** baris data di dalam `<tbody>`, terpisah dari baris judul kolom di `<thead>` — sehingga baris judul **tidak ikut** disaring/disembunyikan.
+- `row.textContent` 
+   mengambil **seluruh teks** di dalam baris itu (gabungan semua sel `<td>`-nya jadi satu string panjang, termasuk teks tombol "Edit"/"Hapus" di dalamnya), lalu diubah ke huruf kecil juga (`.toLowerCase()`) supaya konsisten dengan `keyword`.
+- **`teks.includes(keyword)`** 
+   mengembalikan `true` kalau `teks`**mengandung** `keyword` di bagian mana pun.
+- **`row.style.display = ... ? "" : "none";"`** 
+   mengatur properti CSS
+
+6. Kenapa Baris Disembunyikan, Bukan Dihapus?
+Karena fungsi ini memakai `row.style.display = "none"`, bukan `row.remove()` seperti pada tombol Hapus 
+- `.remove()`  
+   menghapus permanen elemen dari DOM (perlu dibuat ulang untuk memunculkannya lagi), sedangkan
+- `style.display = "none"` 
+   hanya **menyembunyikan sementara** elemennya tetap ada di DOM, hanya tidak terlihat. 
+
