@@ -192,7 +192,6 @@ header nav.nav-open {
 ```
 
 Alur lengkapnya sekarang:
-
 1. Pengguna mengklik tombol hamburger (`#nav-toggle-btn`).
 2. Event listener `click` di [§4.4](#44-memasang-event-listener) terpicu.
 3. `nav.classList.toggle("nav-open")` menambahkan class `nav-open` ke
@@ -205,3 +204,39 @@ Alur lengkapnya sekarang:
    tadi → menu kembali ke `display: none` dari gaya dasarnya → menu
    **tersembunyi lagi**.
 
+
+## 5. JS: Konfirmasi Hapus
+1. Memasang Event Listener ke Banyak Tombol 
+- `querySelectorAll(".btn-hapus")`
+   mengambil **semua** tombol Hapus di satu halaman. 
+- Karena hasilnya berupa **kumpulan** elemen (bukan satu elemen seperti
+   `getElementById`), perlu **`.forEach(...)`** untuk mengulang satu per satu, dan memasang `addEventListener` **terpisah** ke tiap tombol setiap tombol Hapus jadi punya "pendengar klik"-nya sendiri-sendiri.
+
+2. Mencari Baris Tabel yang Jadi Induk Tombol
+**`.closest("tr")`** adalah method yang mencari **ke atas** dari elemen
+`btn` (tombol yang diklik) menuju elemen induknya, berhenti begitu
+menemukan elemen pertama yang cocok dengan selector `"tr"`.
+
+3. Mengambil Nama/Judul dari Baris Itu
+```js
+const nama = row ? row.querySelector("td")?.textContent : "data ini";
+```
+
+- **`kondisi ? nilaiJikaBenar : nilaiJikaSalah`** 
+   adalah **ternary operator** atau bentuk singkat dari `if/else` yang ditulis dalam satu
+   baris sebagai sebuah *nilai* (bukan sebagai blok kode terpisah).
+- **`row.querySelector("td")`** 
+   untuk mengambil sel `<td>` **pertama** di dalam baris itu.
+- **`?.`** (disebut *optional chaining*) 
+   biasa untuk mengakses properti, tapi **aman** kalau nilai di depannya `null`/ `undefined`. 
+- **`.textContent`** 
+   mengambil **teks yang tampil** di dalam elemen itu.
+
+4. Menampilkan Dialog Konfirmasi
+**`confirm(pesan)`** adalah fungsi bawaan browser (bukan sesuatu yang perlu diimpor/didefinisikan) yang menampilkan **kotak dialog bawaan browser** berisi pesan, dengan dua tombol: **OK** dan **Cancel**.
+
+5. Menghapus Baris dari Tampilan
+- `&&` berarti **dan** 
+    kode di dalam `if` hanya dijalankan kalau **kedua** kondisi benar: pengguna menekan OK (`yakin` bernilai`true`) **dan** baris `row` memang ditemukan.
+- **`row.remove()`** 
+   method DOM yang menghapus elemen itu **dari tampilan halaman** secara langsung — baris tabel itu akan lenyap dari layar seketika, tanpa perlu me-reload halaman.
