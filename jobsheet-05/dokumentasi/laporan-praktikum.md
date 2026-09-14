@@ -281,3 +281,120 @@ Karena fungsi ini memakai `row.style.display = "none"`, bukan `row.remove()` sep
 - `style.display = "none"` 
    hanya **menyembunyikan sementara** elemennya tetap ada di DOM, hanya tidak terlihat. 
 
+## 7. JS: Validasi Form
+
+Validasi form menggunakan tiga fungsi utama:
+* `tampilkanError()` → menampilkan pesan error pada field.
+* `hapusError()` → menghapus pesan error yang sudah ada.
+* `initValidasiForm()` → menjalankan validasi saat form di-submit.
+
+### 7.1 Fungsi `tampilkanError()`
+Fungsi ini digunakan untuk menampilkan pesan error pada input.
+```js
+function tampilkanError(input, pesan) {
+    hapusError(input);
+
+    const span = document.createElement("span");
+    span.className = "error";
+    span.textContent = pesan;
+
+    input.insertAdjacentElement("afterend", span);
+}
+```
+
+* `createElement("span")` membuat elemen baru.
+* `className = "error"` memberikan class CSS.
+* `textContent` mengisi pesan error.
+* `insertAdjacentElement("afterend", ...)` menempatkan pesan setelah input.
+
+### 7.2 Fungsi `hapusError()`
+Digunakan untuk menghapus pesan error pada input.
+```js
+function hapusError(input) {
+    const next = input.nextElementSibling;
+
+    if (next && next.classList.contains("error")) {
+        next.remove();
+    }
+}
+```
+
+* `nextElementSibling` mengambil elemen setelah input.
+* `classList.contains("error")` memastikan elemen tersebut adalah pesan error.
+* `remove()` menghapus pesan error.
+
+### 7.3 Fungsi `initValidasiForm()`
+Fungsi utama yang menjalankan validasi ketika form di-submit.
+```js
+function initValidasiForm() {
+    const form = document.getElementById("form-tambah");
+    if (!form) return;
+
+    form.addEventListener("submit", function (e) {
+        let valid = true;
+
+        // pengecekan setiap field
+
+        if (!valid) {
+            e.preventDefault();
+        }
+    });
+}
+```
+
+* `getElementById()` mencari form dengan `id="form-tambah"`.
+* `addEventListener("submit", ...)` menjalankan validasi saat form dikirim.
+* `valid` digunakan untuk menentukan apakah form valid.
+* `e.preventDefault()` mencegah form dikirim jika terdapat kesalahan.
+
+### 7.4 Validasi Setiap Field
+```js
+const judul = form.querySelector("[name='judul'], [name='nama']");
+
+if (judul && judul.value.trim() === "") {
+    tampilkanError(judul, "Field ini wajib diisi.");
+    valid = false;
+} else if (judul) {
+    hapusError(judul);
+}
+```
+
+* `querySelector()` mencari field berdasarkan atribut `name`.
+* `trim()` menghapus spasi di awal dan akhir.
+* Jika kosong, error ditampilkan dan `valid` menjadi `false`.
+* Jika sudah benar, error dihapus.
+
+Untuk tahun:
+```js
+const tahun = form.querySelector("[name='tahun']");
+
+if (tahun) {
+    const nilai = parseInt(tahun.value, 10);
+
+    if (isNaN(nilai) || nilai < 1900 || nilai > 2026) {
+        tampilkanError(tahun, "Tahun harus di antara 1900-2026.");
+        valid = false;
+    } else {
+        hapusError(tahun);
+    }
+}
+```
+
+* `parseInt()` mengubah input menjadi angka.
+* `isNaN()` mengecek apakah hasilnya bukan angka.
+* Tahun harus berada dalam rentang `1900–2026`.
+* Field `stok` menggunakan pola yang sama, tetapi tidak boleh bernilai negatif.
+
+### 7.5 Mencegah Submit
+```js
+if (!valid) {
+    e.preventDefault();
+}
+```
+
+Jika ada field yang tidak valid, `preventDefault()` mencegah form dikirim atau halaman di-reload.
+Jika semua field valid, form tetap menjalankan perilaku bawaan.
+
+## 7.6 Hubungan dengan Form Jobsheet-01
+Form pada jobsheet sebelumnya belum memiliki `action` dan `method`, sehingga data belum benar-benar dikirim ke server.
+Validasi JavaScript hanya berfungsi sebagai **pemeriksaan sebelum submit**. Jadi, validasi ini belum membuat data tersimpan ke database atau server.
