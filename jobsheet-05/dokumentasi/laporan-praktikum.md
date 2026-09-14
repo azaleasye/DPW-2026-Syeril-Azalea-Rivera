@@ -37,7 +37,7 @@ Karena browser membaca elemen html dari atas ke bawah
 ## 2. Perubahan File HTML
 Ada beberapa perubahan HTML agar JavaScript bisa menemukan dan mengatur elemen HTML.
 
-## 2.1 Hamburger 
+### 2.1 Hamburger 
 Sebelumnya menggunakan
    ```html
    <input type="checkbox">
@@ -55,3 +55,14 @@ Perubahannya :
 - id="nav-toggle-btn" digunakan agar JavaScript bisa menemukan tombol.
 - class="nav-toggle-label" tetap digunakan agar CSS lama masih bisa dipakai.
 - aria-label="Menu" membantu screen reader mengetahui bahwa tombol tersebut adalah menu.
+
+### 2.2 Searching
+```html
+<div class="search-box">
+    <label for="search-input">Cari Judul Buku</label>
+    <input type="text" id="search-input" placeholder="Ketik judul buku...">
+</div>
+```
+- Menambahkan search box, dengan pola yang sama seperti form, namun value nya tidak disimpan.
+- Value dari searching hanya akan dibaca oleh JS setiap kali diketik pada bagian placeholder.
+- id="search-input" adalah "kait" yang dicari document.getElementById("search-input")
