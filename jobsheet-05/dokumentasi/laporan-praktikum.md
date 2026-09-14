@@ -72,3 +72,11 @@ Menambahkan class="button-hapus" agar document.querySelectorAll(".btn-hapus") di
 ```html
 <button type="button" class="btn-hapus">Hapus</button>
 ```
+
+### 2.4 Form Tambah 
+```html
+<form id="form-tambah">
+```
+- Menambahkan id form tambah di (`buku/tambah.html` dan `anggota/tambah.html`)
+- id="form-tambah" di tag <form>-nya — sebelumnya (dokumentasi jobsheet-01) tag <form> tidak punya atribut apa pun.
+-  id ini adalah "kait" yang dicari document.getElementById("form-tambah") supaya JavaScript bisa memasang event listener submit untuk validasi.
