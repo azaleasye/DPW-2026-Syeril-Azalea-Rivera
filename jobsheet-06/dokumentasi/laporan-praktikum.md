@@ -55,3 +55,22 @@ Perubahan HTML supaya data bisa diisi dinamis oleh JavaScript.
     <!-- Baris diisi dinamis oleh assets/js/buku.js via fetch('../data/buku.json') -->
 </tbody>
 ```
+
+### 2.3 Urutan Tag `<script>` yang Baru
+1.  `buku/list.html`:
+```html
+<script src="../assets/js/buku.js"></script>
+```
+2. Di `anggota/list.html`:
+```html
+<script src="../assets/js/anggota.js"></script>
+```
+
+- `app.js` dimuat **lebih dulu** (fungsi umum: hamburger, hapus, filter, validasi).
+- Baru kemudian `buku.js` / `anggota.js` (khusus halaman list).
+- Halaman Beranda dan halaman tambah **tidak** memuat `buku.js`/`anggota.js` karena tidak punya tabel data dinamis.
+
+### 2.4 Kenapa `buku.js` dan `anggota.js` Dipisah?
+- Karena `app.js` adalah fungsi umum yang dipakai di **banyak halaman**.
+- `buku.js` dan `anggota.js` adalah fungsi spesifik fetch untuk satu jenis data.
+- Memisahkan file membuat kode lebih pendek, lebih mudah dicari, dan halaman yang tidak butuh tidak memuat kode yang tidak relevan.
