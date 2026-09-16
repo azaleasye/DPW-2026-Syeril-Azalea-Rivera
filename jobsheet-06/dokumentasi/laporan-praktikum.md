@@ -74,3 +74,22 @@ Perubahan HTML supaya data bisa diisi dinamis oleh JavaScript.
 - Karena `app.js` adalah fungsi umum yang dipakai di **banyak halaman**.
 - `buku.js` dan `anggota.js` adalah fungsi spesifik fetch untuk satu jenis data.
 - Memisahkan file membuat kode lebih pendek, lebih mudah dicari, dan halaman yang tidak butuh tidak memuat kode yang tidak relevan.
+
+## 3. Data JSON: `buku.json` & `anggota.json`
+Langkah yang dilakukan:
+1. Add new folder `data` di dalam `jobsheet-06`
+2. Add new file `buku.json` dan `anggota.json` di dalam folder `data`
+
+### 3.3 Kenapa Nama Kuncinya Sama dengan `name` di Form?
+Kunci JSON (`judul`, `pengarang`, `tahun`, `stok` / `no_anggota`, `nama`, `alamat`, `no_hp`) **persis sama** dengan atribut `name` di form Tambah Buku / Tambah Anggota. Karena penamaan konsisten di HTML, JSON, akan membuat data lebih mudah dilacak.
+
+### 3.4 Tipe Data di Dalam JSON
+- Number
+   contoh : `"tahun": 2005` 
+   tanpa kutip dianggap angka (bisa dilakukan operasi seperti `tahun > 2000`).
+- String
+   contoh : `"no_anggota": "A001"` 
+   tetap string/text  karena mengandung huruf, bukan angka murni.
+
+### 3.5 Bagaimana Data Ini Jadi Objek JavaScript?
+`await res.json()` mengubah teks JSON mentah menjadi array objek JavaScript yang bisa diakses lewat `.judul`, `.pengarang`, dst.
