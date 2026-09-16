@@ -13,8 +13,8 @@ Jobsheet ini melanjutkan jobsheet-05 (JavaScript DOM & Event). Bedanya: data tab
 ### 1.1 Apa itu AJAX?
 **AJAX** (*Asynchronous JavaScript and XML*) adalah teknik mengambil data **tanpa me-reload seluruh halaman**.
 
-- Form biasa (jobsheet-01) → submit = halaman dimuat ulang seluruhnya.
-- AJAX → JavaScript ambil data di **latar belakang**, lalu isi sebagian halaman saja (di jobsheet ini: mengisi `<tbody>` tabel).
+- Form biasa (jobsheet-01) untuk submit = halaman dimuat ulang seluruhnya.
+- AJAX untuk JavaScript ambil data di **latar belakang**, lalu isi sebagian halaman saja (di jobsheet ini: mengisi `<tbody>` tabel).
 
 ### 1.2 Apa itu JSON?
 **JSON** (*JavaScript Object Notation*) adalah format teks untuk menyimpan data terstruktur.
@@ -41,9 +41,9 @@ try {
 }
 ```
 
-- `try` → bungkus kode yang berpotensi gagal.
-- `catch` → tangkap error supaya program tidak crash; bisa tampilkan pesan ke pengguna.
-- `finally` → selalu dijalankan (cocok untuk menyembunyikan loading indicator).
+- `try` untuk bungkus kode yang berpotensi gagal.
+- `catch` untuk tangkap error supaya program tidak crash; bisa tampilkan pesan ke pengguna.
+- `finally` untuk selalu dijalankan (cocok untuk menyembunyikan loading indicator).
 
 
 ## 2. Perubahan File HTML
@@ -93,3 +93,90 @@ Kunci JSON (`judul`, `pengarang`, `tahun`, `stok` / `no_anggota`, `nama`, `alama
 
 ### 3.5 Bagaimana Data Ini Jadi Objek JavaScript?
 `await res.json()` mengubah teks JSON mentah menjadi array objek JavaScript yang bisa diakses lewat `.judul`, `.pengarang`, dst.
+
+## 4. JS: Mengambil & Menampilkan Daftar Buku
+Langkah yang dilakukan:
+1. Add new file `buku.js` di dalam `assets/js`
+2. Hubungkan di akhir `buku/list.html` (setelah `app.js`)
+
+### 4.1 Kode Lengkap `muatDaftarBuku`
+### 4.2 Mengambil Elemen yang Dibutuhkan
+```js
+const tbody = document.querySelector(".table-responsive table tbody");
+const loading = document.getElementById("loading-indicator");
+if (!tbody) return;
+```
+- `tbody` untuk tempat baris hasil fetch disisipkan.
+- `loading` untuk elemen indikator “Memuat data...”.
+- Guard clause `if (!tbody) return;` untuk aman kalau elemen tidak ditemukan.
+
+### 4.3 Menampilkan & Menyembunyikan Loading
+```js
+loading.style.display = "block";
+tbody.innerHTML = "";
+```
+- `display = "block"` untuk teks loading muncul (menimpa `display:none` dari HTML).
+- `tbody.innerHTML = ""` untuk mengosongkan tbody (aman kalau fungsi dipanggil ulang).
+- Di akhir, `finally` menyembunyikan loading lagi dengan `display = "none"`.
+
+### 4.4 Simulasi Delay Jaringan
+```js
+await new Promise((resolve) => setTimeout(resolve, 600));
+```
+- Sengaja menunda 600 milidetik supaya loading indicator sempat terlihat.
+- File JSON lokal biasanya sangat cepat; tanpa delay buatan, teks “Memuat data...” hampir tidak kelihatan.
+- Ini **simulasi untuk belajar**, bukan delay jaringan sungguhan.
+
+### 4.5 Mengambil Data dan Memeriksa Keberhasilannya
+```js
+const res = await fetch("../data/buku.json");
+if (!res.ok) {
+    throw new Error("Gagal mengambil data (status " + res.status + ")");
+}
+const daftarBuku = await res.json();
+```
+- Path `../data/buku.json` untuk karena halaman ada di folder `buku/`, naik dulu ke root lalu masuk `data/`.
+- `res.ok` untuk `true` kalau berhasil (status 200-an). `fetch()` **tidak otomatis** gagal hanya karena file 404, jadi harus dicek manual.
+- `throw new Error(...)` untuk melempar error agar masuk ke `catch`.
+- `await res.json()` untuk ubah teks JSON jadi array objek JavaScript.
+
+### 4.6 Membuat Baris Tabel dari Data
+```js
+daftarBuku.forEach(function (buku) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = "...";
+    tbody.appendChild(tr);
+});
+```
+- `forEach` untuk ulang setiap objek buku.
+- `createElement("tr")` untuk buat baris baru dari kode.
+- `tr.innerHTML` untuk isi 5 sel (`judul`, `pengarang`, `tahun`, `stok`, tombol aksi).
+- `appendChild(tr)` untuk sisipkan baris ke `tbody`.
+- Setelah selesai, `tbody` berisi 10 baris meskipun di HTML aslinya kosong.
+
+### 4.7 Menangkap dan Menampilkan Error
+```js
+catch (err) {
+    tbody.innerHTML =
+        "<tr><td colspan=\"5\">Gagal memuat data: " + err.message + "</td></tr>";
+}
+```
+- Kalau fetch gagal atau `throw` dipanggil, blok `catch` yang dijalankan.
+- `err.message` untuk teks penjelasan error.
+- `colspan="5"` untuk satu sel merentang 5 kolom supaya pesan error tampil rapi penuh.
+
+### 4.8 Blok `finally`
+```js
+finally {
+    loading.style.display = "none";
+}
+```
+
+- `finally` **selalu** dijalankan, berhasil maupun gagal.
+- Kalau menyembunyikan loading hanya di akhir `try`, saat error loading bisa macet tampil selamanya.
+
+### 4.9 Memanggil Fungsi Saat Halaman Siap
+```js
+document.addEventListener("DOMContentLoaded", muatDaftarBuku);
+```
+Memastikan HTML siap jadi DOM dulu, baru ambil data.
