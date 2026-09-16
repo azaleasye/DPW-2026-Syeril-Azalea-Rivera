@@ -1,6 +1,6 @@
 async function muatDaftarBuku() {
-    const tbody = document.querySelector(".table-responsive table body");
-    const loading = document.querySelectorAll("loading-indicator");
+    const tbody = document.querySelector(".table-responsive table tbody");
+    const loading = document.getElementById("loading-indicator");
     if (!tbody) return;
 
     loading.style.display = "block";
@@ -9,7 +9,7 @@ async function muatDaftarBuku() {
     try {
         await new Promise((resolve) => setTimeout(resolve, 600));
 
-        const res = await fetch ("../data/buku/json");
+        const res = await fetch ("../data/buku.json");
         if (!res.ok) {
             throw new Error("gagal mengambil data (status " + res.status + ")");
         }

@@ -189,3 +189,47 @@ Langkah yang dilakukan:
 
 ### 5.3 Kenapa Kolom yang Diakses Harus Sama dengan JSON?
 Kalau salah ketik kunci (misalnya `anggota.nomor` padahal di JSON `no_anggota`), JavaScript tidak akan menganggapnya error, nilai jadi `undefined`, dan sel tabel tampil kosong. Jadi nama kunci harus sama.
+
+## 6. JS: Event Delegation pada Tombol Hapus
+Sebelumnya : 
+- `querySelectorAll(".btn-hapus")` mencari tombol yang **sudah ada** saat `DOMContentLoaded`.
+- Lalu memasang listener ke **tiap** tombol satu per satu.
+
+Sesudah : 
+```js
+function initHapusConfirm() {
+    document.addEventListener("click", function (e) {
+        const btn = e.target.closest(".btn-hapus");
+        if (!btn) return;
+
+        const row = btn.closest("tr");
+        const nama = row ? row.querySelector("td")?.textContent : "data ini";
+        const yakin = confirm("Yakin ingin menghapus \"" + nama + "\"?");
+        if (yakin && row) {
+            row.remove();
+        }
+    });
+}
+```
+
+### 6.3 Apa Masalah yang Diperbaiki?
+Di jobsheet-06, `<tbody>` kosong saat halaman baru dimuat. Tombol `.btn-hapus` baru dibuat oleh `buku.js`/`anggota.js` **setelah** `fetch` selesai (plus delay 600ms).
+Jika menggunakan versi lama : 
+1. `DOMContentLoaded` terpicu.
+2. `querySelectorAll(".btn-hapus")` jalan → **belum ada** tombol.
+3. Tidak ada listener yang terpasang.
+4. Tombol Hapus yang muncul belakangan **tidak bereaksi** saat diklik.
+
+### 6.4 Solusi: Event Delegation
+**Event delegation** = pasang **satu** listener di elemen root yang stabil (`document`), bukan di tiap tombol.
+Teknik ini memanfaatkan **event bubbling**: klik di tombol menjalar ke atas (tombol → `td` → `tr` → ... → `document`).
+- `e.target` → elemen paling spesifik yang diklik.
+- `e.target.closest(".btn-hapus")` → cari ke atas, apakah klik itu dari tombol Hapus.
+- `if (!btn) return;` → kalau klik di tempat lain, abaikan.
+- Sisa logika (`closest("tr")`, `confirm()`, `row.remove()`) sama seperti jobsheet-05.
+
+### 6.5 Kenapa Berhasil untuk Tombol yang “Belum Ada”?
+Karena listener ada di `document` (selalu ada sejak awal), ia **tidak peduli** kapan tombol dibuat. Selama tombol sudah ada di DOM **saat diklik**, klik itu tetap menjalar ke `document` dan terdeteksi.
+
+
+
