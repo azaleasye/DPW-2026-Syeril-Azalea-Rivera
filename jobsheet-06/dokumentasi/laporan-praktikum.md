@@ -180,3 +180,12 @@ finally {
 document.addEventListener("DOMContentLoaded", muatDaftarBuku);
 ```
 Memastikan HTML siap jadi DOM dulu, baru ambil data.
+
+## 5. JS: Mengambil & Menampilkan Daftar Anggota
+Struktur anggota.js ini sama dengan buku.js, yang berbeda hanya nama fungsi, variabel, object. dsb.
+Langkah yang dilakukan:
+1. Add new file `anggota.js` di dalam `assets/js`
+2. Hubungkan di akhir `anggota/list.html` (setelah `app.js`)
+
+### 5.3 Kenapa Kolom yang Diakses Harus Sama dengan JSON?
+Kalau salah ketik kunci (misalnya `anggota.nomor` padahal di JSON `no_anggota`), JavaScript tidak akan menganggapnya error, nilai jadi `undefined`, dan sel tabel tampil kosong. Jadi nama kunci harus sama.
