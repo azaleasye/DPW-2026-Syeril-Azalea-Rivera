@@ -1,28 +1,10 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Simpus-Mini | Tambah Anggota</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-</head>
+<?php
+$page_title = "Tambah Anggota";
+include __DIR__ . '/../includes/header.php';
 
-<body>
-    <header>
-        <h1>SIMPUS-Mini</h1>
-        <button type="button" id="nav-toggle-btn" class="nav-toggle-label" aria-label="Menu">&#9776;</button>
-            <nav>
-                <ul>
-                    <li><a href="../index.html">Beranda</a></li>
-                    <li><a href="../buku/list.html">Daftar Buku</a></li>
-                    <li><a href="../buku/tambah.html">Tambah Buku</a></li>
-                    <li><a href="list.html">Daftar Anggota</a></li>
-                    <li><a href="tambah.html">Tambah Anggota</a></li>
-                </ul>
-            </nav>
-    </header>
-
-    <main>
+$flash = $_SESSION['flash'] ?? null;
+unset($_SESSION['flash']);
+?>
         <section>
             <h2>Tambah Anggota</h2>
             <form id="form-tambah">
@@ -47,11 +29,4 @@
                 </p>
         </form>
         </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2026 SIMPUS-Mini &mdash; Jobsheet 2</p>
-    </footer>
-    <script src="assets/js/app.js"></script>
-</body> 
-</html>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

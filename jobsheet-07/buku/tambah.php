@@ -1,29 +1,8 @@
-<!DOCTYPE html>
-<html lang="id">
+<?php
+$page_title = "Tambah Buku";
+include __DIR__ . '/../includes/header.php';
+?>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Simpus-Mini | Tambah Buku</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-</head>
-
-<body>
-    <header>
-        <h1>SIMPUS-Mini</h1>
-        <button type="button" id="nav-toggle-btn" class="nav-toggle-label" aria-label="Menu">&#9776;</button>
-        <nav>
-            <ul>
-                <li><a href="../index.html">Beranda</a></li>
-                <li><a href="list.html">Daftar Buku</a></li>
-                <li><a href="tambah.html">Tambah Buku</a></li>
-                <li><a href="../anggota/list.html">Daftar Anggota</a></li>
-                <li><a href="../anggota/tambah.html">Tambah Anggota</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <main>
         <section>
             <h2>Tambah Buku</h2>
             <form id="form-tambah">
@@ -62,10 +41,5 @@
         </section>
     </main>
 
-    <footer>
-        <p>&copy; 2026 SIMPUS-Mini &mdash; Jobsheet 2</p>
-    </footer>
-    <script src="assets/js/app.js"></script>
-</body>
-
-</html>
+<?php include __DIR__ . '/../includes/footer.php';
+?>
