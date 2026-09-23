@@ -274,3 +274,77 @@ exit;
 
 ### 4.6 Mengapa Validasi Server Penting?
 Validasi HTML dan JavaScript berjalan di browser sehingga masih dapat dilewati. Validasi pada `proses_tambah.php` berjalan di server sehingga tetap dilakukan ketika data dikirim ke server.
+
+## 5. Menampilkan Data: `list.php` & Flash Message
+`list.php` digunakan untuk mengambil data dari `$_SESSION['buku']`, menampilkan pesan flash, dan membuat data buku menjadi tabel HTML.
+
+### 5.1 Mengambil Data dari Session
+Data buku dan flash message diambil dari `$_SESSION`.
+
+```php id="x3k9q1"
+$flash = $_SESSION['flash'] ?? null;
+unset($_SESSION['flash']);
+
+$daftarBuku = $_SESSION['buku'] ?? [];
+```
+
+- `$_SESSION['flash'] ?? null` mengambil pesan flash jika tersedia. Jika tidak ada, nilainya menjadi `null`.
+- `$_SESSION['buku'] ?? []` mengambil daftar buku dari session. Jika belum ada data, digunakan array kosong.
+
+### 5.2 Flash Message
+Flash message adalah pesan yang hanya ditampilkan **sekali** setelah suatu proses selesai.
+
+```php id="q1r7vf"
+$flash = $_SESSION['flash'] ?? null;
+unset($_SESSION['flash']);
+```
+
+`unset()` digunakan untuk menghapus `flash` dari session setelah dibaca. Dengan begitu, pesan tidak muncul lagi ketika halaman `list.php` dibuka kembali.
+
+### 5.3 Menampilkan Flash Message
+Pesan flash ditampilkan hanya jika `$flash` memiliki nilai.
+
+```php id="m8s2kc"
+<?php if ($flash): ?>
+    <p class="flash flash-<?php echo $flash['type']; ?>">
+        <?php echo $flash['pesan']; ?>
+    </p>
+<?php endif; ?>
+```
+
+Jika `$flash['type']` bernilai `success`, hasil class menjadi:
+
+```html
+class="flash flash-success"
+```
+
+Sedangkan jika bernilai `error`:
+
+```html
+class="flash flash-error"
+```
+
+Class tersebut kemudian dapat digunakan untuk memberikan tampilan berbeda melalui CSS.
+
+### 5.4 Menampilkan Data Buku ke Tabel
+Data dari `$_SESSION['buku']` ditampilkan menggunakan `foreach`.
+
+```php
+<?php if (empty($daftarBuku)): ?>
+    <tr>
+        <td colspan="5">Belum ada data buku.</td>
+    </tr>
+<?php else: ?>
+
+    <?php foreach ($daftarBuku as $buku): ?>
+    <tr>
+        <td><?php echo $buku['judul']; ?></td>
+        <td><?php echo $buku['pengarang']; ?></td>
+        <td><?php echo $buku['tahun']; ?></td>
+        <td><?php echo $buku['stok']; ?></td>
+    </tr>
+    <?php endforeach; ?>
+<?php endif; ?>
+```
+
+`empty($daftarBuku)` digunakan untuk mengecek apakah belum ada data buku. Jika ada data, `foreach` mengulang setiap buku dalam array. Variabel `$buku` mewakili satu data buku pada setiap perulangan.

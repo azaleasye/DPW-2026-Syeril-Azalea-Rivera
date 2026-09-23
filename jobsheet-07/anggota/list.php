@@ -11,7 +11,7 @@ $daftarAnggota = $_SESSION['anggota'] ?? [];
             <?php if ($flash): ?>
                 <p class="flash flash-<?php echo $flash['type']; ?>"><?php echo $flash['pesan']; ?></p>
             <?php endif; ?>
-            
+
             <div class="search-box">
                 <label for="search-input">Cari Judul Buku</label>
                 <input type="text" id="search-input" placeholder="Ketik judul buku...">
@@ -29,8 +29,25 @@ $daftarAnggota = $_SESSION['anggota'] ?? [];
                         </tr>
                     </thead>
                     <tbody>
-
-                    </tbody>
+                    <?php if (empty($daftarAnggota)): ?>
+                    <tr>
+                        <td colspan="5">Belum ada data anggota. Silakan tambah lewat menu "Tambah Anggota".</td>
+                    </tr>
+                    <?php else: ?>
+                        <?php foreach ($daftarAnggota as $anggota): ?>
+                        <tr>
+                            <td><?php echo $anggota['no_anggota']; ?></td>
+                            <td><?php echo $anggota['nama']; ?></td>
+                            <td><?php echo $anggota['alamat']; ?></td>
+                            <td><?php echo $anggota['no_hp']; ?></td>
+                            <td>
+                                <button type="button">Edit</button>
+                                <button type="button" class="btn-hapus">Hapus</button>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
                 </table>
             </div>
         </section>
