@@ -96,3 +96,90 @@ require __DIR__ . '/includes/koneksi.php';
 
 `require` digunakan karena `koneksi.php` **wajib berhasil dimuat**. Jika file tidak ditemukan, PHP akan menghentikan eksekusi.
 Jadi, **`koneksi.php` menyediakan `$pdo` sebagai jembatan agar halaman PHP dapat berkomunikasi dengan database PostgreSQL.**
+
+# 5. Menyimpan Data: Prepared Statement & `INSERT`
+Data akan disimpan **langsung ke database PostgreSQL** menggunakan `INSERT` dan **prepared statement**.
+
+## 5.1 Kode `buku/proses_tambah.php`
+
+```php
+require __DIR__ . '/../includes/koneksi.php';
+
+$stmt = $pdo->prepare(
+    "INSERT INTO buku (judul, pengarang, tahun, isbn, stok, kategori)
+     VALUES (:judul, :pengarang, :tahun, :isbn, :stok, :kategori)
+     RETURNING id"
+);
+
+$stmt->execute([
+    'judul' => $judul,
+    'pengarang' => $pengarang,
+    'tahun' => (int) $tahun,
+    'isbn' => $isbn,
+    'stok' => (int) $stok,
+    'kategori' => $kategori,
+]);
+```
+
+Validasi seperti pengecekan judul, tahun, dan stok **tetap sama seperti jobsheet-07**. Yang berubah hanya cara menyimpan datanya.
+
+## 5.2 `INSERT` dan `prepare()`
+Artinya menambahkan **data baru ke tabel `buku`**.
+
+### `VALUES`
+
+```sql
+VALUES (:judul, :pengarang, :tahun, :isbn, :stok, :kategori)
+```
+
+Bagian `:judul`, `:pengarang`, dan lainnya disebut **placeholder**. Placeholder akan diisi dengan nilai sebenarnya saat `execute()` dijalankan.
+
+### `RETURNING id`
+
+```sql
+RETURNING id
+```
+
+Khusus PostgreSQL, digunakan untuk mendapatkan `id` yang otomatis dibuat setelah data berhasil ditambahkan.
+
+### `prepare()`
+
+```php
+$pdo->prepare(...)
+```
+
+Digunakan untuk **menyiapkan query terlebih dahulu**, tetapi belum menjalankannya. Hasilnya disimpan dalam:
+
+```php
+$stmt
+```
+
+## 5.3 Apa Itu Prepared Statement?
+Prepared statement menjalankan query dalam dua tahap:
+1. prepare()
+    Menyiapkan struktur query
+2. execute()
+   Mengisi data dan menjalankan query
+
+Cara ini lebih aman daripada memasukkan nilai langsung ke dalam string SQL karena membantu mencegah **SQL Injection**. 
+Contoh yang tidak disarankan:
+```php
+$pdo->query("INSERT INTO buku (judul) VALUES ('" . $judul . "')");
+```
+
+Dengan prepared statement, data pengguna diperlakukan sebagai **data**, bukan sebagai bagian dari perintah SQL.
+
+## 5.4 Menjalankan Query dengan `execute()`
+```php
+$stmt->execute([
+    'judul' => $judul,
+    'pengarang' => $pengarang,
+    'tahun' => (int) $tahun,
+    'isbn' => $isbn,
+    'stok' => (int) $stok,
+    'kategori' => $kategori,
+]);
+```
+
+`execute()` digunakan untuk **menjalankan query yang sudah disiapkan**. Nama pada array harus sesuai dengan placeholder. Setelah `execute()` berhasil, data benar-benar tersimpan di tabel `buku`.
+
