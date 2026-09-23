@@ -3,6 +3,8 @@ $page_title = "Beranda";
 include __DIR__ . '/includes/header.php';
 require __DIR__ . '/includes/koneksi.php';
 
+$totalBuku = $pdo->query("SELECT COUNT(*) FROM buku")->fetchColumn();
+$totalAnggota = $pdo->query("SELECT COUNT(*) FROM anggota")->fetchColumn();
 ?>
             <section>
                 <h2>Selamat datang di Sistem Perpustakaan Mini</h2>

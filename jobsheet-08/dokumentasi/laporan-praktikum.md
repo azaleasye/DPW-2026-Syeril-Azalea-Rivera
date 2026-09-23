@@ -183,3 +183,123 @@ $stmt->execute([
 
 `execute()` digunakan untuk **menjalankan query yang sudah disiapkan**. Nama pada array harus sesuai dengan placeholder. Setelah `execute()` berhasil, data benar-benar tersimpan di tabel `buku`.
 
+# 6. Membaca Data: `SELECT`
+Setelah data disimpan menggunakan `INSERT`, data perlu dibaca kembali untuk ditampilkan di halaman. Pada bab ini digunakan SQL `SELECT`.
+
+## 6.1 `buku/list.php`: Mengambil Data Buku
+Mengambil data dari database
+```php
+require __DIR__ . '/../includes/koneksi.php';
+
+$daftarBuku = $pdo
+    ->query("SELECT * FROM buku ORDER BY id DESC")
+    ->fetchAll(PDO::FETCH_ASSOC);
+```
+
+### `SELECT * FROM buku`
+```sql
+SELECT * FROM buku
+```
+
+Artinya mengambil **semua kolom dan semua data** dari tabel `buku`.
+
+### `ORDER BY id DESC`
+```sql
+ORDER BY id DESC
+```
+
+Mengurutkan berdasarkan `id` dari **terbesar ke terkecil**. Karena `id` bertambah setiap ada data baru, buku yang **baru ditambahkan akan muncul paling atas**.
+
+## 6.2 `query()` untuk Menjalankan SELECT
+```php
+$pdo->query("SELECT * FROM buku ORDER BY id DESC");
+```
+
+`query()` digunakan untuk menjalankan SQL yang **tidak menggunakan data dari pengguna**.
+Contohnya:
+```sql
+SELECT * FROM buku
+```
+
+Query tersebut selalu memiliki struktur yang sama sehingga tidak membutuhkan placeholder.
+
+## 6.3 Mengambil Hasil dengan `fetchAll()`
+`fetchAll()` mengambil **semua baris hasil query** dan mengubahnya menjadi array PHP.
+`PDO::FETCH_ASSOC` membuat setiap baris menjadi **array asosiatif** berdasarkan nama kolom.
+
+Contohnya:
+```php
+$buku['judul']
+$buku['pengarang']
+$buku['tahun']
+```
+
+Hasilnya memiliki struktur yang mirip dengan data `$_SESSION['buku']` pada jobsheet-07.
+
+## 6.4 Menampilkan Data ke Tabel
+Kode `foreach` untuk menampilkan data **tidak perlu berubah**:
+
+```php
+<?php foreach ($daftarBuku as $buku): ?>
+<tr>
+    <td><?php echo $buku['judul']; ?></td>
+    ...
+</tr>
+<?php endforeach; ?>
+```
+
+Hal ini karena `$daftarBuku` tetap berbentuk array asosiatif meskipun sumber datanya sekarang berasal dari database.
+
+Jadi:
+
+```text
+Database
+   ↓
+SELECT
+   ↓
+fetchAll()
+   ↓
+$daftarBuku
+   ↓
+foreach
+   ↓
+Tabel HTML
+```
+
+## 6.5 `index.php`: Menghitung Jumlah Data
+
+Untuk dashboard, jumlah buku dan anggota dapat dihitung langsung dari database:
+```php
+require __DIR__ . '/includes/koneksi.php';
+
+$totalBuku = $pdo->query("SELECT COUNT(*) FROM buku")->fetchColumn();
+$totalAnggota = $pdo->query("SELECT COUNT(*) FROM anggota")->fetchColumn();
+```
+
+### `COUNT(*)`
+Digunakan untuk **menghitung jumlah baris** dalam tabel `buku`. Database langsung menghitung jumlah datanya sehingga kita tidak perlu mengambil semua data terlebih dahulu.
+
+### `fetchColumn()`
+Digunakan untuk mengambil **satu nilai** dari hasil query. Cocok digunakan dengan `COUNT(*)` karena hasilnya hanya berupa satu angka.
+
+## 6.6 Perbedaan dengan Jobsheet-07
+Sebelumnya:
+```php
+$totalBuku = count($_SESSION['buku'] ?? []);
+```
+
+Sekarang:
+```php
+$totalBuku = $pdo->query("SELECT COUNT(*) FROM buku")->fetchColumn();
+```
+
+Perbedaannya:
+```text
+Jobsheet-07
+Session → count() → jumlah data
+
+Jobsheet-08
+Database → COUNT(*) → jumlah data
+```
+
+Jadi konsepnya tetap sama, tetapi sumber datanya berubah dari **session sementara** menjadi **database**.
