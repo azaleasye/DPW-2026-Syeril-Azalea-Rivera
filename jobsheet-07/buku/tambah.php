@@ -2,10 +2,9 @@
 $page_title = "Tambah Buku";
 include __DIR__ . '/../includes/header.php';
 ?>
-
         <section>
             <h2>Tambah Buku</h2>
-            <form id="form-tambah">
+            <form id="form-tambah" method="post" action="proses_tambah.php">
                 <p>
                     <label for="judul">Judul</label><br>
                     <input type="text" id="judul" name="judul" required>
