@@ -8,3 +8,16 @@ Langkah yang dilakukan:
 2. Create db simpus_mini
 
 ## 2. Skema Database: 01_buku_anggota_sql
+Langkah yang dilakukan: 
+1. Run script query pada folder database (anggota & buku)
+
+**Penjelasan Struktur Table**
+| Kolom       | Tipe Data      | Aturan               | Fungsi         |
+| ----------- | -------------- | -------------------- | -------------- |
+| `id`        | `SERIAL`       | `PRIMARY KEY`        | ID unik buku   |
+| `judul`     | `VARCHAR(255)` | `NOT NULL`           | Judul buku     |
+| `pengarang` | `VARCHAR(255)` | `NOT NULL`           | Nama pengarang |
+| `tahun`     | `INTEGER`      | `NOT NULL`           | Tahun terbit   |
+| `isbn`      | `VARCHAR(50)`  | -                    | Nomor ISBN     |
+| `stok`      | `INTEGER`      | `NOT NULL DEFAULT 0` | Jumlah buku    |
+| `kategori`  | `VARCHAR(50)`  | -                    | Kategori buku  |
