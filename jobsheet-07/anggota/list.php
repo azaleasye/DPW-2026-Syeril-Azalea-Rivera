@@ -1,9 +1,17 @@
 <?php
 $page_title = "Daftar Anggota";
 include __DIR__ . '/../includes/header.php';
+
+$flash = $_SESSION['flash'] ?? null;
+unset($_SESSION['flash']);
+$daftarAnggota = $_SESSION['anggota'] ?? [];
 ?>
         <section>
             <h2>Daftar Anggota</h2>
+            <?php if ($flash): ?>
+                <p class="flash flash-<?php echo $flash['type']; ?>"><?php echo $flash['pesan']; ?></p>
+            <?php endif; ?>
+            
             <div class="search-box">
                 <label for="search-input">Cari Judul Buku</label>
                 <input type="text" id="search-input" placeholder="Ketik judul buku...">
