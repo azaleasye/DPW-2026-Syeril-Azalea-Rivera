@@ -313,3 +313,184 @@ Method `.closest("tr")` digunakan untuk mencari elemen `<tr>` yang menjadi induk
 | Aksi setelah Cancel | Tidak ada           | `e.preventDefault()`   |
 | Penghapusan data    | Hanya dari tampilan | Database               |
 
+## 5. Pagination dan Pencarian Sisi Server
+Pada jobsheet ini, `buku/list.php` dikembangkan dengan fitur **pagination** dan **pencarian sisi server**. Pagination membatasi jumlah data yang ditampilkan pada setiap halaman, sedangkan pencarian digunakan untuk menampilkan data berdasarkan kata kunci.
+
+### 5.1 Query Pagination dan Pencarian
+
+```php
+$perPage = 5;
+$page = max(1, (int) ($_GET['page'] ?? 1));
+$offset = ($page - 1) * $perPage;
+$keyword = trim($_GET['q'] ?? '');
+
+if ($keyword !== '') {
+    $hitung = $pdo->prepare(
+        "SELECT COUNT(*) FROM buku WHERE judul ILIKE :kw"
+    );
+    $hitung->execute(['kw' => '%' . $keyword . '%']);
+    $totalRows = $hitung->fetchColumn();
+
+    $stmt = $pdo->prepare(
+        "SELECT * FROM buku
+         WHERE judul ILIKE :kw
+         ORDER BY id DESC
+         LIMIT :limit OFFSET :offset"
+    );
+    $stmt->bindValue('kw', '%' . $keyword . '%');
+} else {
+    $totalRows = $pdo
+        ->query("SELECT COUNT(*) FROM buku")
+        ->fetchColumn();
+
+    $stmt = $pdo->prepare(
+        "SELECT * FROM buku
+         ORDER BY id DESC
+         LIMIT :limit OFFSET :offset"
+    );
+}
+
+$stmt->bindValue('limit', $perPage, PDO::PARAM_INT);
+$stmt->bindValue('offset', $offset, PDO::PARAM_INT);
+$stmt->execute();
+
+$daftarBuku = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$totalPages = max(
+    1,
+    (int) ceil($totalRows / $perPage)
+);
+```
+
+### 5.2 Pagination
+Pagination digunakan untuk membagi data menjadi beberapa halaman. Pada jobsheet ini, jumlah data yang ditampilkan adalah **5 data per halaman**.
+
+```php
+$perPage = 5;
+$page = max(1, (int) ($_GET['page'] ?? 1));
+$offset = ($page - 1) * $perPage;
+```
+
+`$page` menentukan halaman yang sedang dibuka, sedangkan `$offset` menentukan jumlah data yang dilewati sebelum mengambil data.
+Contohnya:
+
+| Halaman | Offset | Data       |
+| ------- | -----: | ---------- |
+| 1       |      0 | Data 1–5   |
+| 2       |      5 | Data 6–10  |
+| 3       |     10 | Data 11–15 |
+
+### 5.3 `LIMIT` dan `OFFSET`
+Pagination menggunakan `LIMIT` dan `OFFSET` pada query SQL.
+
+```sql
+SELECT * FROM buku
+ORDER BY id DESC
+LIMIT :limit OFFSET :offset
+```
+
+* `LIMIT` membatasi jumlah data yang diambil.
+* `OFFSET` menentukan jumlah data yang dilewati.
+* `ORDER BY id DESC` menjaga urutan data tetap konsisten.
+
+### 5.4 `bindValue()` dan `PDO::PARAM_INT`
+```php
+$stmt->bindValue('limit', $perPage, PDO::PARAM_INT);
+$stmt->bindValue('offset', $offset, PDO::PARAM_INT);
+```
+
+`bindValue()` digunakan untuk mengisi parameter pada prepared statement. `PDO::PARAM_INT` digunakan agar nilai `limit` dan `offset` diproses sebagai bilangan integer.
+
+### 5.5 Pencarian Sisi Server dengan `ILIKE`
+Pencarian dilakukan menggunakan parameter `q` dari URL.
+
+```php
+$keyword = trim($_GET['q'] ?? '');
+
+$stmt = $pdo->prepare(
+    "SELECT * FROM buku
+     WHERE judul ILIKE :kw
+     ORDER BY id DESC
+     LIMIT :limit OFFSET :offset"
+);
+
+$stmt->bindValue('kw', '%' . $keyword . '%');
+```
+
+`ILIKE` merupakan operator PostgreSQL untuk pencarian teks yang **tidak membedakan huruf besar dan kecil**.
+Karakter `%` digunakan sebagai wildcard. Contohnya, kata kunci `bumi` dengan pola `%bumi%` dapat menemukan judul yang mengandung kata tersebut. Jumlah data hasil pencarian juga dihitung menggunakan kondisi yang sama:
+
+```php
+SELECT COUNT(*) FROM buku WHERE judul ILIKE :kw
+```
+Hal ini diperlukan agar jumlah halaman sesuai dengan jumlah hasil pencarian.
+
+### 5.6 Menghitung Jumlah Halaman
+
+```php
+$totalPages = max(
+    1,
+    (int) ceil($totalRows / $perPage)
+);
+```
+
+`ceil()` digunakan untuk membulatkan hasil pembagian ke atas. Misalnya terdapat 12 data dengan 5 data per halaman, maka diperlukan 3 halaman.
+
+### 5.7 Form Pencarian
+Form pencarian menggunakan method `GET` karena pencarian hanya membaca data dan tidak mengubah database.
+
+```html
+<form method="get" action="list.php">
+    <label for="search-input">Cari Judul Buku</label>
+    <input
+        type="text"
+        id="search-input"
+        name="q"
+        value="<?php echo $keyword; ?>"
+        placeholder="Ketik judul buku..."
+    >
+    <button type="submit">Cari</button>
+</form>
+```
+
+Penggunaan `value="<?php echo $keyword; ?>"` membuat kata kunci tetap tampil pada input setelah pencarian dilakukan.
+
+### 5.8 Navigasi Halaman
+Navigasi halaman dibuat menggunakan perulangan `for`.
+```php
+<nav class="pagination">
+    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+        <a
+            href="list.php?page=<?php echo $i; ?><?php
+                echo $keyword !== ''
+                    ? '&q=' . urlencode($keyword)
+                    : '';
+            ?>"
+            class="<?php echo $i === $page ? 'active' : ''; ?>"
+        >
+            <?php echo $i; ?>
+        </a>
+    <?php endfor; ?>
+</nav>
+```
+
+Setiap nomor halaman dibuat menjadi tautan. Jika pencarian sedang digunakan, `urlencode($keyword)` digunakan agar kata kunci tetap terbawa saat berpindah halaman.
+
+Class `active` diberikan pada halaman yang sedang dibuka sehingga dapat diberi tampilan khusus melalui CSS.
+
+### 5.9 Alur Pagination dan Pencarian
+```text
+URL page dan q
+      ↓
+Mengambil halaman dan kata kunci
+      ↓
+Menghitung jumlah data
+      ↓
+SELECT dengan LIMIT dan OFFSET
+      ↓
+Menampilkan hasil
+      ↓
+Membuat navigasi halaman
+```
+
+Dengan fitur ini, `list.php` dapat menampilkan data dalam jumlah terbatas sekaligus menyediakan pencarian berdasarkan judul buku tanpa mengambil seluruh data ke halaman terlebih dahulu.
