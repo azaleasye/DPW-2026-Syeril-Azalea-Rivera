@@ -61,7 +61,6 @@ if (!$id) {
 
 $stmt = $pdo->prepare("SELECT * FROM buku WHERE id = :id");
 $stmt->execute(['id' => $id]);
-
 $buku = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$buku) {
@@ -83,9 +82,7 @@ Data yang telah diambil dari database dimasukkan ke dalam atribut `value` pada f
        required>
 ```
 
-Dengan cara ini, ketika halaman edit dibuka, form sudah berisi data sebelumnya sehingga pengguna hanya perlu mengubah bagian yang diperlukan.
-
-Untuk elemen `<select>`, opsi yang sesuai dengan data lama diberi atribut `selected`.
+Dengan cara ini, ketika halaman edit dibuka, form sudah berisi data sebelumnya sehingga pengguna hanya perlu mengubah bagian yang diperlukan. Untuk elemen `<select>`, opsi yang sesuai dengan data lama diberi atribut `selected`.
 
 ```php
 <option value="<?php echo $value; ?>"
@@ -156,3 +153,100 @@ Data berhasil diperbarui
 ```
 
 Hal yang paling penting pada operasi `UPDATE` adalah penggunaan klausa **`WHERE`** agar perubahan hanya dilakukan pada data yang dituju.
+
+## 3. Menghapus Data: `hapus.php`
+`hapus.php` digunakan untuk menghapus data buku dari database. Meskipun kode yang digunakan relatif singkat, proses Delete perlu memperhatikan metode HTTP dan penggunaan klausa `WHERE`.
+
+### 3.1 Kode `hapus.php`
+```php
+<?php
+session_start();
+require __DIR__ . '/../includes/koneksi.php';
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: list.php');
+    exit;
+}
+
+$id = $_POST['id'] ?? null;
+
+if ($id) {
+    $stmt = $pdo->prepare("DELETE FROM buku WHERE id = :id");
+    $stmt->execute(['id' => $id]);
+
+    $_SESSION['flash'] = [
+        'type' => 'success',
+        'pesan' => 'Buku berhasil dihapus.'
+    ];
+}
+
+header('Location: list.php');
+exit;
+```
+
+### 3.2 Penggunaan Method `POST`
+Proses Delete menggunakan method **`POST`**, bukan `GET`. Hal ini dilakukan agar penghapusan data tidak dapat dipicu hanya dengan membuka sebuah URL.
+
+```php
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: list.php');
+    exit;
+}
+```
+
+`$_SERVER['REQUEST_METHOD']` digunakan untuk mengetahui metode HTTP yang digunakan. Jika request bukan `POST`, pengguna diarahkan kembali ke `list.php` tanpa menjalankan proses penghapusan.
+
+### 3.3 Menghapus Data dengan `DELETE`
+Data yang dikirim melalui form diterima menggunakan `$_POST`.
+
+```php
+$id = $_POST['id'] ?? null;
+
+if ($id) {
+    $stmt = $pdo->prepare(
+        "DELETE FROM buku WHERE id = :id"
+    );
+
+    $stmt->execute(['id' => $id]);
+}
+```
+
+Perintah `DELETE` digunakan untuk menghapus data dari tabel `buku`. Klausa `WHERE id = :id` memastikan hanya data dengan `id` yang sesuai yang dihapus. Penggunaan `WHERE` sangat penting. Jika `DELETE FROM buku` dijalankan tanpa `WHERE`, seluruh data dalam tabel dapat terhapus.
+
+### 3.4 Form untuk Menghapus Data
+Pada `list.php`, proses Delete dipicu menggunakan form dengan method `POST`.
+
+```html
+<form class="form-hapus" method="post" action="hapus.php">
+    <input type="hidden" name="id" value="<?php echo $buku['id']; ?>">
+    <button type="submit" class="btn-hapus">Hapus</button>
+</form>
+```
+
+Form tersebut memiliki tiga bagian utama:
+* `method="post"` digunakan agar request menggunakan `POST`.
+* `<input type="hidden">` menyimpan `id` buku yang akan dihapus.
+* `<button type="submit">` digunakan untuk mengirim form ke `hapus.php`.
+
+Setelah proses penghapusan selesai, pengguna diarahkan kembali ke `list.php` dan flash message digunakan untuk menampilkan informasi bahwa data berhasil dihapus.
+
+### 3.5 Alur Proses Delete
+```text
+list.php
+   ↓
+Klik tombol Hapus
+   ↓
+Form POST mengirim id
+   ↓
+hapus.php
+   ↓
+Validasi method POST
+   ↓
+DELETE FROM buku WHERE id = :id
+   ↓
+Flash message
+   ↓
+Kembali ke list.php
+```
+
+Dengan demikian, operasi Delete dilakukan secara terarah menggunakan `POST` dan `WHERE id` untuk memastikan hanya data yang dipilih yang dihapus.
