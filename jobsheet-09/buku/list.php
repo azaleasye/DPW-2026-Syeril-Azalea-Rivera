@@ -42,7 +42,7 @@ $daftarBuku = $pdo->query("SELECT * FROM buku ORDER BY id DESC")->fetchAll(PDO::
                             <td><?php echo $buku['tahun']; ?></td>
                             <td><?php echo $buku['stok']; ?></td>
                             <td>
-                                <button type="button">Edit</button>
+                                <a href="edit.php?id=<?php echo $buku['id']; ?>" class="btn-edit">Edit</a>
                                 <button type="button" class="btn-hapus">Hapus</button>
                             </td>
                         </tr>
