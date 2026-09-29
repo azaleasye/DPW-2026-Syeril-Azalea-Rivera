@@ -272,3 +272,71 @@ session_destroy()
    ↓
 login.php
 ```
+
+## 4. Guard Halaman: `includes/auth.php`
+`auth.php` digunakan untuk membatasi akses ke halaman yang membutuhkan login. File ini memeriksa apakah `$_SESSION['user_id']` tersedia.
+
+### 4.1 Kode `includes/auth.php`
+```php id="3flp2e"
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ../auth/login.php');
+    exit;
+}
+```
+Jika session `user_id` belum tersedia, pengguna dianggap belum login dan diarahkan ke halaman Login.
+
+### 4.2 Penggunaan pada Halaman Terkunci
+```php id="2x8h6d"
+<?php
+require __DIR__ . '/../includes/auth.php';
+
+$page_title = "Tambah Buku";
+include __DIR__ . '/../includes/header.php';
+```
+
+`auth.php` harus dipanggil **sebelum `header.php`** agar pemeriksaan login dan redirect dilakukan sebelum HTML dikirim ke browser.
+
+### 4.3 Kenapa `auth.php` Harus Dipanggil Lebih Dulu?
+`header('Location: ...')` hanya dapat digunakan sebelum ada output HTML. Jika `header.php` dipanggil lebih dulu, HTML sudah dikirim sehingga redirect dapat gagal dengan pesan **"headers already sent"**.
+Urutan yang benar:
+```text
+auth.php → pemeriksaan login → header.php → halaman
+```
+
+### 4.4 Pemeriksaan `session_status()`
+```php id="a8r3sm"
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+```
+
+Pengecekan ini membuat `session_start()` aman digunakan dari beberapa file. Jika session sudah aktif, PHP tidak menjalankan `session_start()` lagi.
+
+### 4.5 Pemeriksaan `$_SESSION['user_id']`
+```php id="v7a6yo"
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ../auth/login.php');
+    exit;
+}
+```
+
+`user_id` disimpan saat login berhasil. Jika data tersebut tidak tersedia, pengguna belum login atau sudah logout sehingga langsung diarahkan ke Login.
+
+### 4.6 Tidak Bergantung pada Database
+`auth.php` hanya memeriksa `$_SESSION` dan tidak menggunakan `$pdo` atau koneksi database. Karena itu, guard tetap dapat bekerja meskipun PostgreSQL belum tersambung.
+
+### 4.7 Halaman yang Menggunakan Guard
+`auth.php` digunakan pada:
+* `buku/tambah.php`
+* `buku/edit.php`
+* `buku/proses_tambah.php`
+* `buku/proses_edit.php`
+* `buku/hapus.php`
+* Seluruh halaman `anggota/*.php`
+
+Sedangkan `index.php` dan `buku/list.php` tetap dapat diakses tanpa login.
