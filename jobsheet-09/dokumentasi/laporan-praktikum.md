@@ -494,3 +494,26 @@ Membuat navigasi halaman
 ```
 
 Dengan fitur ini, `list.php` dapat menampilkan data dalam jumlah terbatas sekaligus menyediakan pencarian berdasarkan judul buku tanpa mengambil seluruh data ke halaman terlebih dahulu.
+
+## 6. CSS Pendukung Fitur Baru
+CSS tambahan digunakan untuk mendukung fitur **Edit, Hapus, pagination, dan pencarian**.
+
+### 6.1 Tautan Edit
+
+Tautan `<a>` untuk Edit diberi tampilan seperti tombol menggunakan `display: inline-block`, `padding`, `border-radius`, dan `font-size`. Selector dengan koma digunakan agar tombol lama dan tautan Edit memiliki warna yang sama.
+
+### 6.2 Form Hapus
+Form Hapus dibuat `inline` agar tombol Hapus tetap sejajar dengan tautan Edit dalam satu sel `<td>`. Tanpa aturan ini, `<form>` sebagai elemen block dapat membuat tombol berada di baris baru.
+
+### 6.3 Navigasi Pagination
+* `display: flex` menyusun nomor halaman secara horizontal.
+* `gap` memberikan jarak antar tombol.
+* `.pagination a` memberikan bentuk tombol pada setiap nomor halaman.
+* `.pagination a.active` menandai halaman yang sedang dibuka dengan warna biru.
+
+### 6.4 Form Pencarian
+* `display: flex` menyusun form pencarian secara horizontal.
+* `gap` memberikan jarak antara input dan tombol.
+* `align-items: flex-end` menyamakan posisi bagian bawah input dan tombol.
+* `.search-box button` memberikan tampilan tombol biru dengan teks putih.
+* `cursor: pointer` mengubah kursor saat tombol diarahkan.
