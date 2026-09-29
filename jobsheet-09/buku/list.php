@@ -43,7 +43,10 @@ $daftarBuku = $pdo->query("SELECT * FROM buku ORDER BY id DESC")->fetchAll(PDO::
                             <td><?php echo $buku['stok']; ?></td>
                             <td>
                                 <a href="edit.php?id=<?php echo $buku['id']; ?>" class="btn-edit">Edit</a>
-                                <button type="button" class="btn-hapus">Hapus</button>
+                                <form class="form-hapus" method="post" action="hapus.php">
+                                    <input type="hidden" name="id" value="<?php echo $buku['id']; ?>">
+                                    <button type="submit" class="btn-hapus">Hapus</button>
+                                </form>
                             </td>
                         </tr>
                         <?php endforeach; ?>
