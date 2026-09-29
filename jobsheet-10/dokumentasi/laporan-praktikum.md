@@ -125,11 +125,9 @@ if ($cek->fetch()) {
     exit;
 }
 ```
-
 Sebelum data disimpan, sistem memeriksa apakah username sudah digunakan. Meskipun database memiliki constraint `UNIQUE`, pengecekan ini digunakan agar aplikasi dapat memberikan pesan error yang lebih mudah dipahami.
 
 ### 2.5 Menyimpan User dan Hash Password
-
 ```php
 $stmt = $pdo->prepare(
     "INSERT INTO users (nama, username, password, role)
@@ -142,11 +140,135 @@ $stmt->execute([
     'password' => password_hash($password, PASSWORD_DEFAULT),
 ]);
 ```
-
 `password_hash()` digunakan untuk mengubah password asli menjadi hash sebelum disimpan ke database.
-
 `PASSWORD_DEFAULT` menggunakan algoritma hashing default yang disediakan PHP. Role ditentukan langsung sebagai `'petugas'` agar pengguna tidak dapat menentukan role sendiri melalui form registrasi.
 
 **Alur registrasi:**
-
 `Form Registrasi → Validasi → Cek Username → Hash Password → INSERT ke users`
+
+Berikut versi yang lebih ringkas untuk laporan, dengan bagian penting seperti `password_verify()`, session, logout, dan alur autentikasi tetap dipertahankan.
+
+## 3. Login & Logout
+### 3.1 `auth/login.php` — Form Login
+```php
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (isset($_SESSION['user_id'])) {
+    header('Location: ../index.php');
+    exit;
+}
+
+$page_title = "Login";
+include __DIR__ . '/../includes/header.php';
+```
+
+Kode ini memeriksa session dan mengarahkan pengguna ke `index.php` jika sudah login. Jika belum, halaman menampilkan form username dan password.
+
+### 3.2 `proses_login.php` — Verifikasi Password
+
+```php
+$username = trim($_POST['username'] ?? '');
+$password = $_POST['password'] ?? '';
+
+$stmt = $pdo->prepare(
+    "SELECT * FROM users WHERE username = :username"
+);
+$stmt->execute(['username' => $username]);
+
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['nama'] = $user['nama'];
+    $_SESSION['role'] = $user['role'];
+
+    header('Location: ../index.php');
+    exit;
+}
+
+$_SESSION['flash'] = [
+    'type' => 'error',
+    'pesan' => 'Username atau password salah.'
+];
+
+header('Location: login.php');
+exit;
+```
+
+Proses login dilakukan dengan:
+1. Mengambil username dan password dari form.
+2. Mencari user berdasarkan username.
+3. Menggunakan `password_verify()` untuk mencocokkan password dengan hash yang tersimpan.
+4. Jika berhasil, identitas pengguna disimpan ke session.
+5. Jika gagal, pengguna dikembalikan ke halaman login dengan pesan error.
+
+`$user && password_verify(...)` memastikan user ditemukan terlebih dahulu sebelum password diverifikasi.
+
+### 3.3 Menyimpan Identitas ke Session
+```php
+$_SESSION['user_id'] = $user['id'];
+$_SESSION['nama'] = $user['nama'];
+$_SESSION['role'] = $user['role'];
+```
+
+| Session   | Fungsi                               |
+| --------- | ------------------------------------ |
+| `user_id` | Menandakan pengguna sudah login      |
+| `nama`    | Menampilkan nama pengguna            |
+| `role`    | Disiapkan untuk pengaturan hak akses |
+
+Pesan kesalahan dibuat umum:
+
+```php
+$_SESSION['flash'] = [
+    'type' => 'error',
+    'pesan' => 'Username atau password salah.'
+];
+```
+
+Pesan tidak membedakan username dan password yang salah agar tidak memberikan informasi tambahan mengenai akun yang terdaftar.
+
+### 3.4 `auth/logout.php` — Mengakhiri Session
+```php
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+session_destroy();
+
+header('Location: login.php');
+exit;
+```
+
+`session_destroy()` menghapus session pengguna sehingga pengguna tidak lagi dianggap login. Setelah itu, pengguna diarahkan kembali ke halaman Login.
+
+### 3.5 Alur Login dan Logout
+```text
+[register.php]
+      ↓
+[proses_register.php]
+      ↓ password_hash()
+[Database users]
+      ↓
+[login.php]
+      ↓
+[proses_login.php]
+      ↓ password_verify()
+   ┌──┴──────────────┐
+   ↓                 ↓
+Berhasil           Gagal
+   ↓                 ↓
+Set Session       Flash Error
+   ↓                 ↓
+index.php         login.php
+   ↓
+Logout
+   ↓
+session_destroy()
+   ↓
+login.php
+```
