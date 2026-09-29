@@ -1,4 +1,5 @@
 <?php
+require __DIR__ . '/../includes/auth.php';
 $page_title = "Tambah Anggota";
 include __DIR__ . '/../includes/header.php';
 
@@ -11,13 +12,14 @@ unset($_SESSION['flash']);
             <?php if ($flash): ?>
                 <p class="flash flash-<?php echo $flash['type']; ?>"><?php echo $flash['pesan']; ?></p>
             <?php endif; ?>
+
             <form id="form-tambah" method="post" action="proses_tambah.php">
                 <p>
                     <label for="nama">Nama</label><br>
                     <input type="text" id="nama" name="nama" required>
                 </p>
                 <p>
-                    <label for="no_anggota">No Anggota</label><br>
+                    <label for="no_anggota">No. Anggota</label><br>
                     <input type="text" id="no_anggota" name="no_anggota" required>
                 </p>
                 <p>
@@ -31,6 +33,6 @@ unset($_SESSION['flash']);
                 <p>
                     <button type="submit">Simpan</button>
                 </p>
-        </form>
+            </form>
         </section>
 <?php include __DIR__ . '/../includes/footer.php'; ?>

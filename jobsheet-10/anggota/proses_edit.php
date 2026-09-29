@@ -2,10 +2,16 @@
 require __DIR__ . '/../includes/auth.php';
 require __DIR__ . '/../includes/koneksi.php';
 
+$id = $_POST['id'] ?? null;
 $nama = trim($_POST['nama'] ?? '');
 $noAnggota = trim($_POST['no_anggota'] ?? '');
 $alamat = trim($_POST['alamat'] ?? '');
 $noHp = trim($_POST['no_hp'] ?? '');
+
+if (!$id) {
+    header('Location: list.php');
+    exit;
+}
 
 $errors = [];
 if ($nama === '') {
@@ -17,22 +23,22 @@ if ($noAnggota === '') {
 
 if (!empty($errors)) {
     $_SESSION['flash'] = ['type' => 'error', 'pesan' => implode(' ', $errors)];
-    header('Location: tambah.php');
+    header('Location: edit.php?id=' . urlencode($id));
     exit;
 }
 
 $stmt = $pdo->prepare(
-    "INSERT INTO anggota (nama, no_anggota, alamat, no_hp)
-     VALUES (:nama, :no_anggota, :alamat, :no_hp)
-     RETURNING id"
+    "UPDATE anggota SET nama = :nama, no_anggota = :no_anggota,
+     alamat = :alamat, no_hp = :no_hp WHERE id = :id"
 );
 $stmt->execute([
     'nama' => $nama,
     'no_anggota' => $noAnggota,
     'alamat' => $alamat,
     'no_hp' => $noHp,
+    'id' => $id,
 ]);
 
-$_SESSION['flash'] = ['type' => 'success', 'pesan' => 'Anggota berhasil ditambahkan.'];
+$_SESSION['flash'] = ['type' => 'success', 'pesan' => 'Anggota berhasil diperbarui.'];
 header('Location: list.php');
 exit;
