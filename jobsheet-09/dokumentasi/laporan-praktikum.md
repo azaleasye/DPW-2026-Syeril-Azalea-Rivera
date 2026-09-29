@@ -250,3 +250,66 @@ Kembali ke list.php
 ```
 
 Dengan demikian, operasi Delete dilakukan secara terarah menggunakan `POST` dan `WHERE id` untuk memastikan hanya data yang dipilih yang dihapus.
+
+## 4. JavaScript: Konfirmasi Hapus via Event `submit`
+
+Pada jobsheet sebelumnya, konfirmasi penghapusan dilakukan menggunakan event `click`. Setelah tombol Hapus diubah menjadi form dengan `method="post"`, konfirmasi perlu dilakukan pada event `submit` agar pengiriman data ke server dapat dibatalkan.
+
+### 4.1 Kode `initHapusConfirm()`
+
+```js id="r7jv2k"
+function initHapusConfirm() {
+    document.addEventListener("submit", function (e) {
+        const form = e.target;
+
+        if (!form.classList.contains("form-hapus")) return;
+
+        const row = form.closest("tr");
+        const nama = row
+            ? row.querySelector("td")?.textContent
+            : "data ini";
+
+        const yakin = confirm(
+            "Yakin ingin menghapus \"" + nama + "\"?"
+        );
+
+        if (!yakin) {
+            e.preventDefault();
+        }
+    });
+}
+```
+
+Fungsi tersebut menggunakan **event delegation** pada `document` untuk menangani form dengan class `form-hapus`.
+
+### 4.2 Perubahan dari Event `click` ke `submit`
+Tombol berada di dalam form yang benar-benar mengirim data ke server. Oleh karena itu, event `submit` digunakan agar konfirmasi dapat dilakukan **sebelum form dikirim ke server**.
+
+`e.target` pada event `submit` merupakan elemen `<form>` yang sedang dikirim. Pemeriksaan `classList.contains("form-hapus")` memastikan fungsi hanya bekerja pada form Hapus.
+
+### 4.3 Membatalkan Submit dengan `preventDefault()`
+```js id="0b3h4p"
+const yakin = confirm("Yakin ingin menghapus \"" + nama + "\"?");
+
+if (!yakin) {
+    e.preventDefault();
+}
+```
+Jika pengguna memilih **OK**, form akan dilanjutkan dan dikirim ke `hapus.php`.
+Jika pengguna memilih **Cancel**, `e.preventDefault()` digunakan untuk membatalkan proses submit sehingga data tidak jadi dihapus.
+
+### 4.4 Mencari Baris Data
+```js id="6m2j8q"
+const row = form.closest("tr");
+```
+Method `.closest("tr")` digunakan untuk mencari elemen `<tr>` yang menjadi induk dari form Hapus. Dari baris tersebut, nama atau judul data dapat digunakan untuk ditampilkan pada pesan konfirmasi.
+
+### 4.5 Perbandingan dengan Jobsheet Sebelumnya
+
+| Aspek               | Jobsheet-05/06      | Jobsheet-09            |
+| ------------------- | ------------------- | ---------------------- |
+| Event               | `click`             | `submit`               |
+| Aksi setelah OK     | `row.remove()`      | Form dikirim ke server |
+| Aksi setelah Cancel | Tidak ada           | `e.preventDefault()`   |
+| Penghapusan data    | Hanya dari tampilan | Database               |
+
