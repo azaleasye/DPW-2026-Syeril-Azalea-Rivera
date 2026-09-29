@@ -48,6 +48,18 @@ header nav a {
     font-weight: 500;
 }
 
+.auth-status {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #fff;
+}
+
+.auth-status a {
+    color: #fff;
+    text-decoration: underline;
+}
+
 /* Main Layout */
 main {
     max-width: 1000px;
@@ -194,6 +206,7 @@ td form.form-hapus {
     color: #fff;
     cursor: pointer;
 }
+
 
 /* Form */
 form p {
