@@ -1,4 +1,5 @@
 <?php
+
 require __DIR__ . '/../includes/auth.php';
 require __DIR__ . '/../includes/koneksi.php';
 
@@ -8,31 +9,52 @@ $alamat = trim($_POST['alamat'] ?? '');
 $noHp = trim($_POST['no_hp'] ?? '');
 
 $errors = [];
+
 if ($nama === '') {
     $errors[] = "Nama wajib diisi.";
 }
+
 if ($noAnggota === '') {
     $errors[] = "No. Anggota wajib diisi.";
 }
 
 if (!empty($errors)) {
-    $_SESSION['flash'] = ['type' => 'error', 'pesan' => implode(' ', $errors)];
+
+    $_SESSION['flash'] = [
+        'type' => 'error',
+        'pesan' => implode(' ', $errors)
+    ];
+
     header('Location: tambah.php');
     exit;
 }
 
-$stmt = $pdo->prepare(
-    "INSERT INTO anggota (nama, no_anggota, alamat, no_hp)
-     VALUES (:nama, :no_anggota, :alamat, :no_hp)
-     RETURNING id"
+$result = supabaseRequest(
+    'POST',
+    'anggota',
+    [
+        'nama' => $nama,
+        'no_anggota' => $noAnggota,
+        'alamat' => $alamat,
+        'no_hp' => $noHp
+    ]
 );
-$stmt->execute([
-    'nama' => $nama,
-    'no_anggota' => $noAnggota,
-    'alamat' => $alamat,
-    'no_hp' => $noHp,
-]);
 
-$_SESSION['flash'] = ['type' => 'success', 'pesan' => 'Anggota berhasil ditambahkan.'];
-header('Location: list.php');
+if ($result['status'] >= 200 && $result['status'] < 300) {
+
+    $_SESSION['flash'] = [
+        'type' => 'success',
+        'pesan' => 'Anggota berhasil ditambahkan.'
+    ];
+
+    header('Location: list.php');
+    exit;
+}
+
+$_SESSION['flash'] = [
+    'type' => 'error',
+    'pesan' => 'Anggota gagal ditambahkan.'
+];
+
+header('Location: tambah.php');
 exit;

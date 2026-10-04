@@ -1,8 +1,10 @@
 <?php
+
 require __DIR__ . '/../includes/auth.php';
 require __DIR__ . '/../includes/koneksi.php';
 
 $id = $_POST['id'] ?? null;
+
 $nama = trim($_POST['nama'] ?? '');
 $noAnggota = trim($_POST['no_anggota'] ?? '');
 $alamat = trim($_POST['alamat'] ?? '');
@@ -14,31 +16,59 @@ if (!$id) {
 }
 
 $errors = [];
+
 if ($nama === '') {
     $errors[] = "Nama wajib diisi.";
 }
+
 if ($noAnggota === '') {
     $errors[] = "No. Anggota wajib diisi.";
 }
 
 if (!empty($errors)) {
-    $_SESSION['flash'] = ['type' => 'error', 'pesan' => implode(' ', $errors)];
-    header('Location: edit.php?id=' . urlencode($id));
+
+    $_SESSION['flash'] = [
+        'type' => 'error',
+        'pesan' => implode(' ', $errors)
+    ];
+
+    header(
+        'Location: edit.php?id=' . urlencode($id)
+    );
+
     exit;
 }
 
-$stmt = $pdo->prepare(
-    "UPDATE anggota SET nama = :nama, no_anggota = :no_anggota,
-     alamat = :alamat, no_hp = :no_hp WHERE id = :id"
+$result = supabaseRequest(
+    'PATCH',
+    'anggota',
+    [
+        'nama' => $nama,
+        'no_anggota' => $noAnggota,
+        'alamat' => $alamat,
+        'no_hp' => $noHp
+    ],
+    'id=eq.' . (int) $id
 );
-$stmt->execute([
-    'nama' => $nama,
-    'no_anggota' => $noAnggota,
-    'alamat' => $alamat,
-    'no_hp' => $noHp,
-    'id' => $id,
-]);
 
-$_SESSION['flash'] = ['type' => 'success', 'pesan' => 'Anggota berhasil diperbarui.'];
-header('Location: list.php');
+if ($result['status'] >= 200 && $result['status'] < 300) {
+
+    $_SESSION['flash'] = [
+        'type' => 'success',
+        'pesan' => 'Anggota berhasil diperbarui.'
+    ];
+
+    header('Location: list.php');
+    exit;
+}
+
+$_SESSION['flash'] = [
+    'type' => 'error',
+    'pesan' => 'Anggota gagal diperbarui.'
+];
+
+header(
+    'Location: edit.php?id=' . urlencode($id)
+);
+
 exit;

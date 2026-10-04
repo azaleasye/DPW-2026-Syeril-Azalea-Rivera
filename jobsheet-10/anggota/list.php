@@ -1,6 +1,9 @@
 <?php
+
 require __DIR__ . '/../includes/auth.php';
+
 $page_title = "Daftar Anggota";
+
 include __DIR__ . '/../includes/header.php';
 require __DIR__ . '/../includes/koneksi.php';
 
@@ -10,25 +13,46 @@ unset($_SESSION['flash']);
 $perPage = 5;
 $page = max(1, (int) ($_GET['page'] ?? 1));
 $offset = ($page - 1) * $perPage;
+
 $keyword = trim($_GET['q'] ?? '');
 
+$query = 'select=*&order=id.desc';
+
 if ($keyword !== '') {
-    $hitung = $pdo->prepare("SELECT COUNT(*) FROM anggota WHERE nama ILIKE :kw");
-    $hitung->execute(['kw' => '%' . $keyword . '%']);
-    $totalRows = $hitung->fetchColumn();
-
-    $stmt = $pdo->prepare("SELECT * FROM anggota WHERE nama ILIKE :kw ORDER BY id DESC LIMIT :limit OFFSET :offset");
-    $stmt->bindValue('kw', '%' . $keyword . '%');
-} else {
-    $totalRows = $pdo->query("SELECT COUNT(*) FROM anggota")->fetchColumn();
-    $stmt = $pdo->prepare("SELECT * FROM anggota ORDER BY id DESC LIMIT :limit OFFSET :offset");
+    $query .= '&nama=ilike.*' . rawurlencode($keyword) . '*';
 }
-$stmt->bindValue('limit', $perPage, PDO::PARAM_INT);
-$stmt->bindValue('offset', $offset, PDO::PARAM_INT);
-$stmt->execute();
 
-$daftarAnggota = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$totalPages = max(1, (int) ceil($totalRows / $perPage));
+$query .= '&limit=' . $perPage;
+$query .= '&offset=' . $offset;
+
+$result = supabaseRequest(
+    'GET',
+    'anggota',
+    null,
+    $query
+);
+
+$daftarAnggota = $result['data'] ?? [];
+
+$countQuery = 'select=id';
+
+if ($keyword !== '') {
+    $countQuery .= '&nama=ilike.*' . rawurlencode($keyword) . '*';
+}
+
+$countResult = supabaseRequest(
+    'GET',
+    'anggota',
+    null,
+    $countQuery
+);
+
+$totalRows = count($countResult['data'] ?? []);
+
+$totalPages = max(
+    1,
+    (int) ceil($totalRows / $perPage)
+);
 ?>
         <section>
             <h2>Daftar Anggota</h2>

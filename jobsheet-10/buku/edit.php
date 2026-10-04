@@ -13,7 +13,13 @@ if (!$id) {
     exit;
 }
 
-$stmt = $pdo->prepare("SELECT * FROM buku WHERE id = :id");
+$result = supabaseRequest(
+    'GET',
+    'buku',
+    null,
+    'select=*&id=eq.' . (int) $id
+);
+$buku = $result['data'][0] ?? null;
 $stmt->execute(['id' => $id]);
 $buku = $stmt->fetch(PDO::FETCH_ASSOC);
 

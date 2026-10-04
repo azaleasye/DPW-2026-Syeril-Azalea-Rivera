@@ -1,6 +1,6 @@
 <?php
+
 require __DIR__ . '/../includes/auth.php';
-session_start();
 require __DIR__ . '/../includes/koneksi.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -9,10 +9,30 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $id = $_POST['id'] ?? null;
+
 if ($id) {
-    $stmt = $pdo->prepare("DELETE FROM buku WHERE id = :id");
-    $stmt->execute(['id' => $id]);
-    $_SESSION['flash'] = ['type' => 'success', 'pesan' => 'Buku berhasil dihapus.'];
+
+    $result = supabaseRequest(
+        'DELETE',
+        'buku',
+        null,
+        'id=eq.' . (int) $id
+    );
+
+    if ($result['status'] >= 200 && $result['status'] < 300) {
+
+        $_SESSION['flash'] = [
+            'type' => 'success',
+            'pesan' => 'Buku berhasil dihapus.'
+        ];
+
+    } else {
+
+        $_SESSION['flash'] = [
+            'type' => 'error',
+            'pesan' => 'Buku gagal dihapus.'
+        ];
+    }
 }
 
 header('Location: list.php');

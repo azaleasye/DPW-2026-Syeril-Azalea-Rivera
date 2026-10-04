@@ -340,3 +340,65 @@ if (!isset($_SESSION['user_id'])) {
 * Seluruh halaman `anggota/*.php`
 
 Sedangkan `index.php` dan `buku/list.php` tetap dapat diakses tanpa login.
+
+## 5. Navbar Dinamis & CSS Pendukung
+### 5.1 Kode Navbar Dinamis
+Navbar dibuat dinamis berdasarkan status login pengguna. Menu dan tombol Login/Logout akan berubah sesuai kondisi session.
+
+### 5.2 Mengecek Status Login
+```php id="8j4qcv"
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$sudahLogin = isset($_SESSION['user_id']);
+```
+
+Session diperiksa terlebih dahulu agar navbar dapat mengetahui apakah pengguna sudah login. Hasil pengecekan disimpan dalam `$sudahLogin` sehingga dapat digunakan beberapa kali.
+
+### 5.3 Menu Berdasarkan Status Login
+```php id="p8y5o0"
+<?php if ($sudahLogin): ?>
+    <li><a href="<?php echo $base; ?>buku/tambah.php">Tambah Buku</a></li>
+    <li><a href="<?php echo $base; ?>anggota/list.php">Daftar Anggota</a></li>
+    <li><a href="<?php echo $base; ?>anggota/tambah.php">Tambah Anggota</a></li>
+<?php endif; ?>
+```
+
+Menu **Beranda** dan **Daftar Buku** tetap tampil untuk semua pengguna. Menu lainnya hanya ditampilkan ketika pengguna sudah login. Menyembunyikan menu bukan merupakan sistem keamanan. Proteksi sebenarnya tetap dilakukan oleh `includes/auth.php`.
+
+### 5.4 Status Login
+```php id="w6p2kr"
+<div class="auth-status">
+    <?php if ($sudahLogin): ?>
+        <span><?php echo $_SESSION['nama']; ?></span>
+        <a href="<?php echo $base; ?>auth/logout.php">Logout</a>
+    <?php else: ?>
+        <a href="<?php echo $base; ?>auth/login.php">Login</a>
+    <?php endif; ?>
+</div>
+```
+
+* Jika sudah login, navbar menampilkan **nama pengguna** dan **Logout**.
+* Jika belum login, navbar hanya menampilkan **Login**.
+
+### 5.5 CSS `.auth-status`
+```css id="s9q1ex"
+.auth-status {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #fff;
+}
+
+.auth-status a {
+    color: #fff;
+    text-decoration: underline;
+}
+```
+
+* `display: flex` menyusun nama dan tautan secara horizontal.
+* `align-items: center` menyamakan posisi secara vertikal.
+* `gap` memberikan jarak antar elemen.
+* `color: #fff` membuat teks berwarna putih.
+* `text-decoration: underline` memberi pembeda visual pada tautan Login/Logout.
