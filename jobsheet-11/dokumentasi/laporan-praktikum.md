@@ -94,6 +94,111 @@ Hal ini penting karena karakter seperti tanda kutip dapat memengaruhi struktur a
 ### 2.5 Kolom Angka Tidak Wajib Menggunakan `e()`
 Kolom seperti `tahun` dan `stok` bertipe `INTEGER` di database sehingga hanya menyimpan angka.
 Penggunaan `e()` pada nilai angka tidak salah, tetapi perlindungan XSS terutama diperlukan pada data teks yang berasal dari pengguna.
-```
 
 Penerapan XSS dan Fungsi 'e()' dilakukan pada Buku: list & edit, serta Anggota: list & edit.
+
+## 3. CSRF & Token Verifikasi
+### 3.1 Pengertian CSRF
+**CSRF (Cross-Site Request Forgery)** adalah celah keamanan yang memungkinkan situs lain mengirimkan request ke aplikasi atas nama pengguna yang sedang login tanpa sepengetahuan pengguna.
+
+Contohnya, situs lain dapat membuat form tersembunyi yang mengirim request `POST` ke `hapus.php`. Walaupun aplikasi sudah membatasi penghapusan hanya menggunakan `POST`, request tersebut tetap dapat dikirim oleh situs lain.
+
+Karena browser tetap mengirim cookie session pengguna yang sedang login, server dapat menganggap request tersebut sebagai request yang sah. Oleh karena itu, diperlukan **CSRF token** sebagai lapisan keamanan tambahan.
+
+### 3.2 Konsep Token CSRF
+CSRF token adalah nilai acak yang dibuat dan disimpan oleh server dalam session. Token tersebut kemudian disertakan pada setiap form yang melakukan request `POST`. Saat request diterima, server membandingkan token dari form dengan token yang tersimpan di session.
+
+Alur CSRF:
+```text
+Form aplikasi → Token CSRF → Server
+                           ↓
+                    Verifikasi token
+                    ↓             ↓
+                  Valid         Tidak valid
+                    ↓             ↓
+                 Proses        HTTP 403
+```
+
+Situs lain tidak mengetahui token yang benar sehingga request palsu akan ditolak.
+
+### 3.3 Membuat Token dengan `csrf_token()`
+Dilakukan pada Includes: csrf.php
+
+```php
+function csrf_token()
+{
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+
+    return $_SESSION['csrf_token'];
+}
+```
+
+Fungsi tersebut:
+* `random_bytes(32)` menghasilkan data acak yang aman secara kriptografis.
+* `bin2hex()` mengubah data tersebut menjadi teks hexadecimal.
+* Token disimpan dalam `$_SESSION['csrf_token']`.
+* Token hanya dibuat sekali selama session masih aktif.
+
+### 3.4 Menyisipkan Token ke Form
+Dilakukan pada Includes: csrf.php
+Token dimasukkan ke dalam form menggunakan `csrf_field()`:
+
+```php
+function csrf_field()
+{
+    return '<input type="hidden" name="csrf_token" value="' . csrf_token() . '">';
+}
+```
+
+Kemudian digunakan di dalam form:
+```php
+<?php echo csrf_field(); ?>
+```
+
+Token disimpan sebagai `input type="hidden"` sehingga tidak terlihat oleh pengguna, tetapi tetap dikirim bersama request.
+
+### 3.5 Memverifikasi Token dengan `csrf_verify()`
+Pada sisi server, token diperiksa menggunakan:
+```php
+function csrf_verify()
+{
+    $token = $_POST['csrf_token'] ?? '';
+
+    if (
+        $token === '' ||
+        !hash_equals($_SESSION['csrf_token'] ?? '', $token)
+    ) {
+        http_response_code(403);
+        die('Permintaan ditolak: token CSRF tidak valid atau kedaluwarsa.');
+    }
+}
+```
+
+Fungsi Penting:
+* `$_POST['csrf_token']` mengambil token dari form.
+* `hash_equals()` membandingkan token secara aman.
+* `http_response_code(403)` memberikan status **403 Forbidden** jika token tidak valid.
+* `die()` menghentikan proses sehingga operasi database tidak dijalankan.
+
+### 3.6 Memanggil `csrf_verify()` pada Proses Data
+Setiap proses `POST` yang dilindungi memanggil `csrf_verify()` sebelum mengolah data.
+
+Contoh:
+```php
+require __DIR__ . '/../includes/auth.php';
+require __DIR__ . '/../includes/csrf.php';
+require __DIR__ . '/../includes/koneksi.php';
+
+csrf_verify();
+$judul = trim($_POST['judul'] ?? '');
+```
+
+Urutannya adalah:
+1. `auth.php` memastikan pengguna sudah login.
+2. `csrf.php` menyediakan fungsi CSRF.
+3. `csrf_verify()` memeriksa token.
+4. Data baru diproses jika token valid.
+
+Pemeriksaan `auth.php` dilakukan lebih dahulu agar pengguna yang belum login langsung diarahkan ke halaman login.
