@@ -1,6 +1,5 @@
 <?php
 require __DIR__ . '/../includes/auth.php';
-session_start();
 require __DIR__ . '/../includes/koneksi.php';
 
 $judul = trim($_POST['judul'] ?? '');
@@ -10,7 +9,8 @@ $isbn = trim($_POST['isbn'] ?? '');
 $stok = $_POST['stok'] ?? '';
 $kategori = trim($_POST['kategori'] ?? '');
 
-// validasi
+// Validasi server-side — wajib ada meski sudah divalidasi JS di Jobsheet 5,
+// karena validasi client bisa dilewati (nonaktifkan JS / kirim request manual).
 $errors = [];
 if ($judul === '') {
     $errors[] = "Judul wajib diisi.";

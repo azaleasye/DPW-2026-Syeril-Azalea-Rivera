@@ -3,6 +3,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 $sudahLogin = isset($_SESSION['user_id']);
+
+// Prefix relatif ke root proyek ini (bukan root domain) — supaya
+// /assets, /index.php, dst tetap benar walau proyek diakses lewat
+// subfolder (mis. dp2026.test/kode-praktikum/jobsheet-10/), bukan cuma
+// lewat vhost yang document root-nya langsung folder ini.
 $__jobsheetRoot = dirname(__DIR__);
 $__scriptDir = dirname($_SERVER['SCRIPT_FILENAME']);
 $__rel = ltrim(str_replace('\\', '/', substr($__scriptDir, strlen($__jobsheetRoot))), '/');

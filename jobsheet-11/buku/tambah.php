@@ -12,6 +12,7 @@ unset($_SESSION['flash']);
             <?php if ($flash): ?>
                 <p class="flash flash-<?php echo $flash['type']; ?>"><?php echo $flash['pesan']; ?></p>
             <?php endif; ?>
+
             <form id="form-tambah" method="post" action="proses_tambah.php">
                 <p>
                     <label for="judul">Judul</label><br>
@@ -31,13 +32,13 @@ unset($_SESSION['flash']);
                 </p>
                 <p>
                     <label for="stok">Stok</label><br>
-                    <input type="number" id="stok" name="stok" min="0"required>
+                    <input type="number" id="stok" name="stok" min="0" required>
                 </p>
                 <p>
                     <label for="kategori">Kategori</label><br>
                     <select id="kategori" name="kategori">
                         <option value="fiksi">Fiksi</option>
-                        <option value="non-fiksi">Non Fiksi</option>
+                        <option value="non-fiksi">Non-Fiksi</option>
                         <option value="referensi">Referensi</option>
                     </select>
                 </p>
@@ -46,7 +47,4 @@ unset($_SESSION['flash']);
                 </p>
             </form>
         </section>
-    </main>
-
-<?php include __DIR__ . '/../includes/footer.php';
-?>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

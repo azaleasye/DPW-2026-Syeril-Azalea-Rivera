@@ -1,5 +1,4 @@
-/* Reset & Base */
-
+/* ===== Reset & Base ===== */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -14,17 +13,17 @@ body {
 }
 
 a {
-    color: #F49BAB;
-    text-decoration: none
+    color: #1d5b8a;
+    text-decoration: none;
 }
 
 a:hover {
     text-decoration: underline;
 }
 
-/* Header & Navbar (Flexbox) */
+/* ===== Header & Navbar (Flexbox) ===== */
 header {
-    background-color: #F49BAB;
+    background-color: #1d5b8a;
     color: #fff;
     padding: 1rem 1.5rem;
     display: flex;
@@ -60,11 +59,11 @@ header nav a {
     text-decoration: underline;
 }
 
-/* Main Layout */
+/* ===== Main Layout ===== */
 main {
     max-width: 1000px;
     margin: 2rem auto;
-    padding: 0 1.5rem
+    padding: 0 1.5rem;
 }
 
 section {
@@ -72,23 +71,19 @@ section {
     border-radius: 8px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08)
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 section h2 {
     margin-bottom: 1rem;
-    color: #F49BAB;
+    color: #1d5b8a;
 }
 
-/* Kartu Statistik (CSS Grid) */
+/* ===== Kartu Statistik (CSS Grid) ===== */
 main section:nth-of-type(2) {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
-}
-
-main section:nth-of-type(2) h2 {
-    grid-column: 1 / -1;
 }
 
 main section:nth-of-type(2) article {
@@ -107,11 +102,11 @@ main section:nth-of-type(2) article h3 {
 main section:nth-of-type(2) article p {
     font-size: 1.8rem;
     font-weight: 700;
-    color: #F49BAB;
+    color: #1d5b8a;
 }
 
-/* Table */
-table{
+/* ===== Tabel ===== */
+table {
     width: 100%;
     border-collapse: collapse;
 }
@@ -119,12 +114,12 @@ table{
 th, td {
     text-align: left;
     padding: 0.65rem 0.75rem;
-    border-bottom: 1px solid #eef4fa;
+    border-bottom: 1px solid #e2e6ea;
 }
 
 thead {
-    background-color: #F49BAB;
-    color: #fff ;
+    background-color: #1d5b8a;
+    color: #fff;
 }
 
 tbody tr:nth-child(even) {
@@ -141,17 +136,12 @@ td button {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin-right: 0.35rem;
+    font-size: 0.85rem;
 }
 
 td button:first-of-type,
 td a.btn-edit {
     background-color: #f0ad4e;
-    color: #fff;
-}
-
-td button:nth-of-type(2) {
-    background-color: #FF9137;
     color: #fff;
 }
 
@@ -172,7 +162,7 @@ td form.form-hapus {
     display: inline;
 }
 
-/* Pagination */
+/* ===== Pagination ===== */
 .pagination {
     display: flex;
     gap: 0.5rem;
@@ -207,8 +197,7 @@ td form.form-hapus {
     cursor: pointer;
 }
 
-
-/* Form */
+/* ===== Form ===== */
 form p {
     margin-bottom: 1rem;
 }
@@ -220,7 +209,8 @@ form label {
     color: #444;
 }
 
-form input, form select {
+form input,
+form select {
     width: 100%;
     max-width: 400px;
     padding: 0.55rem 0.7rem;
@@ -230,8 +220,9 @@ form input, form select {
 }
 
 form button[type="submit"] {
-    background-color: #F49BAB;
+    background-color: #1d5b8a;
     color: #fff;
+    border: none;
     padding: 0.6rem 1.5rem;
     border-radius: 4px;
     font-size: 1rem;
@@ -242,20 +233,20 @@ form button[type="submit"]:hover {
     background-color: #164869;
 }
 
-/* footer */
+/* ===== Footer ===== */
 footer {
-    text-align:center;
+    text-align: center;
     padding: 1.25rem;
     color: #7a8794;
     font-size: 0.9rem;
 }
 
-/* table responsive */
+/* ===== Tabel Responsif ===== */
 .table-responsive {
     overflow-x: auto;
 }
 
-/* Hamburger Menu */
+/* ===== Hamburger Menu (JS-driven) ===== */
 .nav-toggle-label {
     display: none;
     font-size: 1.6rem;
@@ -283,7 +274,7 @@ footer {
     color: #721c24;
 }
 
-/* Pesan ERROR */
+/* ===== Pesan Error Validasi ===== */
 .error {
     display: block;
     color: #d9534f;
@@ -291,7 +282,7 @@ footer {
     margin-top: 0.25rem;
 }
 
-/* Kolom Pencarian */
+/* ===== Kolom Pencarian ===== */
 .search-box {
     margin-bottom: 1rem;
 }
@@ -304,44 +295,47 @@ footer {
     border-radius: 4px;
 }
 
-/* breakpoint tablet */
+/* ===== Responsive Breakpoints ===== */
+
+/* Tablet ke bawah */
 @media (max-width: 768px) {
     main section:nth-of-type(2) {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-/* breakpoint mobile */
+/* Mobile */
 @media (max-width: 480px) {
     header {
-    position: relative;
-}
+        position: relative;
+    }
 
-.nav-toggle-label {
-    display: block;
-}
+    .nav-toggle-label {
+        display: block;
+    }
 
-header nav {
-    display: none;
-    width: 100%;
-    order: 3;
-    margin-top: 1rem;
-}
+    header nav {
+        display: none;
+        width: 100%;
+        order: 3;
+        margin-top: 1rem;
+    }
 
-header nav.nav-open {
-    display: block;
-}
+    header nav.nav-open {
+        display: block;
+    }
 
-header nav ul {
-    flex-direction: column;
-}
+    header nav ul {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
 
-main section:nth-of-type(2) {
-    grid-template-columns: 1fr;
-}
+    main section:nth-of-type(2) {
+        grid-template-columns: 1fr;
+    }
 
-form input,
-form select {
-    max-width: 100%;
-}
+    form input,
+    form select {
+        max-width: 100%;
+    }
 }

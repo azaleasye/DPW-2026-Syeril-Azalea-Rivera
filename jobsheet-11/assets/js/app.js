@@ -1,4 +1,4 @@
-// Hamburger Menu
+// ===== Hamburger menu (JS-driven, menggantikan checkbox hack) =====
 function initNavToggle() {
     const toggleBtn = document.getElementById("nav-toggle-btn");
     const nav = document.querySelector("header nav");
@@ -9,22 +9,26 @@ function initNavToggle() {
     });
 }
 
-// Konfirmasi Hapus
+// ===== Konfirmasi hapus =====
+// Tombol Hapus kini berada di dalam <form class="form-hapus" method="post">
+// yang benar-benar mengirim request DELETE ke server (buku/hapus.php,
+// anggota/hapus.php). Konfirmasi dilakukan pada event "submit" agar bisa
+// dibatalkan (preventDefault) sebelum request terkirim.
 function initHapusConfirm() {
     document.addEventListener("submit", function (e) {
         const form = e.target;
         if (!form.classList.contains("form-hapus")) return;
 
-        const row = btn.closest("tr");
+        const row = form.closest("tr");
         const nama = row ? row.querySelector("td")?.textContent : "data ini";
         const yakin = confirm("Yakin ingin menghapus \"" + nama + "\"?");
-        if (yakin && row) {
-            row.remove();
+        if (!yakin) {
+            e.preventDefault();
         }
     });
 }
 
-// Filter Pencarian Table
+// ===== Filter/pencarian tabel real-time =====
 function initTableFilter() {
     const input = document.getElementById("search-input");
     const table = document.querySelector(".table-responsive table");
@@ -40,7 +44,6 @@ function initTableFilter() {
     });
 }
 
-// Validasi Form
 // ===== Validasi form (client-side) =====
 function tampilkanError(input, pesan) {
     hapusError(input);

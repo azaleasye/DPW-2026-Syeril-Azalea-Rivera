@@ -26,41 +26,47 @@ $stmt->bindValue('limit', $perPage, PDO::PARAM_INT);
 $stmt->bindValue('offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 
-$daftarBuku = $pdo->query("SELECT * FROM buku ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
-$totalPages = max(1, (int) ceil($totalRows/$perPage));
+$daftarBuku = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$totalPages = max(1, (int) ceil($totalRows / $perPage));
 ?>
         <section>
             <h2>Daftar Buku</h2>
+
             <?php if ($flash): ?>
                 <p class="flash flash-<?php echo $flash['type']; ?>"><?php echo $flash['pesan']; ?></p>
             <?php endif; ?>
 
             <div class="search-box">
-                <label for="search-input">Cari Judul Buku</label>
-                <input type="text" id="search-input" placeholder="Ketik judul buku...">
+                <form method="get" action="list.php">
+                    <span>
+                        <label for="search-input">Cari Judul Buku</label><br>
+                        <input type="text" id="search-input" name="q" value="<?php echo e($keyword); ?>" placeholder="Ketik judul buku...">
+                    </span>
+                    <button type="submit">Cari</button>
+                </form>
             </div>
 
             <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Judul</th>
-                            <th>Pengarang</th>
-                            <th>Tahun</th>
-                            <th>Stok</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Judul</th>
+                        <th>Pengarang</th>
+                        <th>Tahun</th>
+                        <th>Stok</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
                     <?php if (empty($daftarBuku)): ?>
                     <tr>
-                        <td colspan="5">Belum ada data buku. Silakan tambah lewat menu "Tambah Buku".</td>
+                        <td colspan="5">Tidak ada data buku yang cocok.</td>
                     </tr>
                     <?php else: ?>
                         <?php foreach ($daftarBuku as $buku): ?>
                         <tr>
-                            <td><?php echo $buku['judul']; ?></td>
-                            <td><?php echo $buku['pengarang']; ?></td>
+                            <td><?php echo e($buku['judul']); ?></td>
+                            <td><?php echo e($buku['pengarang']); ?></td>
                             <td><?php echo $buku['tahun']; ?></td>
                             <td><?php echo $buku['stok']; ?></td>
                             <td>
@@ -74,7 +80,7 @@ $totalPages = max(1, (int) ceil($totalRows/$perPage));
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </tbody>
-                </table>
+            </table>
             </div>
 
             <nav class="pagination">
@@ -83,6 +89,5 @@ $totalPages = max(1, (int) ceil($totalRows/$perPage));
                    class="<?php echo $i === $page ? 'active' : ''; ?>"><?php echo $i; ?></a>
                 <?php endfor; ?>
             </nav>
-            
         </section>
 <?php include __DIR__ . '/../includes/footer.php'; ?>

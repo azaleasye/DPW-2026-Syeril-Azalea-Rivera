@@ -1,3 +1,8 @@
+-- Jobsheet 8: skema awal database simpus_mini (PostgreSQL)
+-- Jalankan setelah membuat database, misal:
+--   createdb simpus_mini
+--   psql -d simpus_mini -f sql/01_buku_anggota.sql
+
 CREATE TABLE IF NOT EXISTS buku (
     id SERIAL PRIMARY KEY,
     judul VARCHAR(255) NOT NULL,
