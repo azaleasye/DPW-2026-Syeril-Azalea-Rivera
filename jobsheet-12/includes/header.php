@@ -33,6 +33,7 @@ $base = $__rel === '' ? '' : str_repeat('../', substr_count($__rel, '/') + 1);
                 <li><a href="<?php echo $base; ?>buku/tambah.php">Tambah Buku</a></li>
                 <li><a href="<?php echo $base; ?>anggota/list.php">Daftar Anggota</a></li>
                 <li><a href="<?php echo $base; ?>anggota/tambah.php">Tambah Anggota</a></li>
+                <li><a href="<?php echo $base; ?>peminjaman/tambah.php">Peminjaman Baru</a></li>
                 <?php endif; ?>
             </ul>
         </nav>
