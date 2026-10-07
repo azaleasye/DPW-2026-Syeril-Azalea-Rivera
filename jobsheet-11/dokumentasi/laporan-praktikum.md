@@ -202,3 +202,83 @@ Urutannya adalah:
 4. Data baru diproses jika token valid.
 
 Pemeriksaan `auth.php` dilakukan lebih dahulu agar pengguna yang belum login langsung diarahkan ke halaman login.
+
+
+## 4. Session Fixation
+### 4.1 Pengertian Session Fixation
+**Session Fixation** adalah serangan ketika penyerang mengetahui atau menentukan ID session korban sebelum korban login. Jika ID tersebut tetap digunakan setelah login, penyerang berpotensi menggunakan session yang sama untuk mengakses akun korban.
+
+### 4.2 Penyebab Session Fixation
+Session digunakan server untuk mengenali pengguna antar halaman. Jika ID session sebelum login tetap digunakan setelah login, ID yang sudah diketahui penyerang dapat tetap terhubung dengan akun pengguna setelah berhasil login.
+Karena itu, ID session perlu diganti ketika terjadi perubahan status dari **belum login menjadi sudah login**.
+
+### 4.3 Solusi dengan `session_regenerate_id(true)`
+Perbaikan dilakukan pada `auth/proses_login.php` setelah password berhasil diverifikasi:
+
+```php id="8q1jfk"
+if ($user && password_verify($password, $user['password'])) {
+    session_regenerate_id(true);
+
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['nama'] = $user['nama'];
+    $_SESSION['role'] = $user['role'];
+
+    header('Location: ../index.php');
+    exit;
+}
+```
+
+`session_regenerate_id(true)` berfungsi untuk:
+* Mengganti ID session lama dengan ID baru.
+* Mempertahankan data `$_SESSION`.
+* Menghapus session lama ketika parameter `true` digunakan.
+* Mencegah ID session yang mungkin sudah diketahui penyerang tetap digunakan setelah login.
+
+Fungsi ini ditempatkan **setelah `password_verify()` berhasil dan sebelum data pengguna disimpan ke session**. Dengan demikian, session baru digunakan untuk menyimpan identitas pengguna yang telah login.
+
+### 4.4 Mengapa Tidak Digunakan Saat Registrasi dan Logout?
+`session_regenerate_id(true)` hanya diperlukan pada proses login karena terjadi perubahan status dari **belum login → sudah login**.
+* **Registrasi:** pengguna belum langsung login sehingga belum terjadi perubahan status session menjadi login.
+* **Logout:** menggunakan `session_destroy()` untuk mengakhiri session sehingga tidak diperlukan regenerasi ID.
+
+Dengan demikian, meskipun hanya membutuhkan satu baris kode, `session_regenerate_id(true)` penting untuk mengamankan session pada saat proses login.
+
+## 4. Session Fixation
+
+### 4.1 Pengertian Session Fixation
+**Session Fixation** adalah serangan ketika penyerang mengetahui atau menentukan ID session korban sebelum korban login. Jika ID tersebut tetap digunakan setelah login, penyerang berpotensi menggunakan session yang sama untuk mengakses akun korban.
+
+### 4.2 Penyebab Session Fixation
+Session digunakan server untuk mengenali pengguna antar halaman. Jika ID session sebelum login tetap digunakan setelah login, ID yang sudah diketahui penyerang dapat tetap terhubung dengan akun pengguna setelah berhasil login.
+Karena itu, ID session perlu diganti ketika terjadi perubahan status dari **belum login menjadi sudah login**.
+
+### 4.3 Solusi dengan `session_regenerate_id(true)`
+Perbaikan dilakukan pada `auth/proses_login.php` setelah password berhasil diverifikasi:
+
+```php id="8q1jfk"
+if ($user && password_verify($password, $user['password'])) {
+    session_regenerate_id(true);
+
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['nama'] = $user['nama'];
+    $_SESSION['role'] = $user['role'];
+
+    header('Location: ../index.php');
+    exit;
+}
+```
+
+`session_regenerate_id(true)` berfungsi untuk:
+* Mengganti ID session lama dengan ID baru.
+* Mempertahankan data `$_SESSION`.
+* Menghapus session lama ketika parameter `true` digunakan.
+* Mencegah ID session yang mungkin sudah diketahui penyerang tetap digunakan setelah login.
+
+Fungsi ini ditempatkan **setelah `password_verify()` berhasil dan sebelum data pengguna disimpan ke session**. Dengan demikian, session baru digunakan untuk menyimpan identitas pengguna yang telah login.
+
+### 4.4 Mengapa Tidak Digunakan Saat Registrasi dan Logout?
+`session_regenerate_id(true)` hanya diperlukan pada proses login karena terjadi perubahan status dari **belum login → sudah login**.
+* **Registrasi:** pengguna belum langsung login sehingga belum terjadi perubahan status session menjadi login.
+* **Logout:** menggunakan `session_destroy()` untuk mengakhiri session sehingga tidak diperlukan regenerasi ID.
+
+Dengan demikian, meskipun hanya membutuhkan satu baris kode, `session_regenerate_id(true)` penting untuk mengamankan session pada saat proses login.
