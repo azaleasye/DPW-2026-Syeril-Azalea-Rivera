@@ -29,3 +29,71 @@ Prinsip ini sudah diterapkan pada jobsheet sebelumnya melalui:
 * **Regenerasi session ID** untuk meningkatkan keamanan session.
 
 Dengan demikian, Jobsheet 11 melanjutkan konsep keamanan yang sudah diterapkan sebelumnya dan menambahkan perlindungan terhadap **XSS, CSRF, dan Session Fixation**.
+
+## 2. XSS & Fungsi `e()`
+### 2.1 Pengertian XSS
+**XSS (Cross-Site Scripting)** adalah celah keamanan yang memungkinkan penyerang menyisipkan kode HTML atau JavaScript melalui input aplikasi. Kode tersebut kemudian dapat dijalankan di browser pengguna lain.
+Contohnya, pengguna memasukkan:
+
+```html
+<script>alert('halaman ini sudah diretas!')</script>
+```
+
+Jika data tersebut langsung ditampilkan dengan:
+```php
+<td><?php echo $buku['judul']; ?></td>
+```
+
+browser dapat menganggapnya sebagai kode HTML/JavaScript dan menjalankannya.
+
+### 2.2 Fungsi `e()` sebagai Perlindungan XSS
+Untuk mencegah XSS, dibuat helper `e()` pada `includes/helpers.php`:
+```php
+function e($value)
+{
+    return htmlspecialchars((string) ($value ?? ''), ENT_QUOTES, 'UTF-8');
+}
+```
+
+Fungsi `e()` menggunakan `htmlspecialchars()` untuk mengubah karakter khusus HTML seperti `<`, `>`, `"`, dan `'` menjadi HTML entity. 
+```
+
+akan ditampilkan sebagai teks biasa, bukan dijalankan sebagai JavaScript.
+
+Parameter yang digunakan:
+* `(string)` memastikan nilai diproses sebagai teks.
+* `?? ''` memberikan nilai kosong jika data `null`.
+* `ENT_QUOTES` melakukan escape pada tanda kutip tunggal dan ganda.
+* `UTF-8` memastikan karakter ditangani dengan encoding yang benar.
+
+### 2.3 Penggunaan `e()` pada Output
+```php
+<td><?php echo e($buku['judul']); ?></td>
+```
+
+`e()` digunakan pada data yang berasal dari database atau input pengguna, seperti:
+* Judul buku
+* Pengarang
+* Nama anggota
+* Alamat
+* Nomor HP
+* Nilai pencarian
+* Nama petugas pada navbar
+
+### 2.4 `e()` pada Atribut `value`
+Data yang dimasukkan ke atribut HTML juga perlu di-escape:
+```php
+<input type="text"
+       id="judul"
+       name="judul"
+       value="<?php echo e($buku['judul']); ?>"
+       required>
+```
+Hal ini penting karena karakter seperti tanda kutip dapat memengaruhi struktur atribut HTML. `ENT_QUOTES` pada `e()` membantu mencegah data pengguna menyisipkan atribut atau kode HTML tambahan.
+
+### 2.5 Kolom Angka Tidak Wajib Menggunakan `e()`
+Kolom seperti `tahun` dan `stok` bertipe `INTEGER` di database sehingga hanya menyimpan angka.
+Penggunaan `e()` pada nilai angka tidak salah, tetapi perlindungan XSS terutama diperlukan pada data teks yang berasal dari pengguna.
+```
+
+Penerapan XSS dan Fungsi 'e()' dilakukan pada Buku: list & edit, serta Anggota: list & edit.
