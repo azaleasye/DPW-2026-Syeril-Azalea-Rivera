@@ -249,3 +249,85 @@ Proses pengembalian menggunakan dua lapisan keamanan, yaitu pemeriksaan HTTP met
 Pendekatan menggunakan beberapa lapisan keamanan ini disebut **defense in depth**, yaitu tidak bergantung pada satu mekanisme keamanan saja.
 
 Dengan implementasi ini, fitur pengembalian berfungsi untuk **mencatat pengembalian, memperbarui status transaksi, mengisi tanggal pengembalian, mengembalikan stok buku, serta mencegah pengembalian ganda melalui transaction dan `FOR UPDATE`**.
+
+
+## 4. Pengembalian Buku
+Modul pengembalian buku merupakan kebalikan dari proses peminjaman. Jika peminjaman mengurangi stok buku, maka pengembalian akan menambah kembali stok buku dan mengubah status transaksi menjadi sudah dikembalikan.
+
+### 4.1 `peminjaman/kembali.php`: Daftar Transaksi Aktif
+Halaman `kembali.php` digunakan untuk menampilkan daftar buku yang sedang dipinjam dan belum dikembalikan.
+
+Tambahan dan fungsinya:
+* **`JOIN`**: menggabungkan tabel `peminjaman`, `buku`, dan `anggota` sehingga halaman dapat menampilkan judul buku dan nama anggota.
+* **`WHERE p.status = 'dipinjam'`**: memastikan hanya transaksi yang masih aktif yang ditampilkan.
+* **Pencarian dengan `GET` dan `ILIKE`**: memungkinkan pengguna mencari transaksi berdasarkan data yang tersedia.
+* **Form pengembalian dengan `POST`**: memastikan proses pengembalian tidak dilakukan melalui URL atau `GET`.
+* **CSRF token**: melindungi form pengembalian dari serangan CSRF.
+* **Hidden input `id`**: mengirim ID transaksi yang akan dikembalikan ke `proses_kembali.php`.
+* **Tombol "Kembalikan"**: digunakan untuk menjalankan proses pengembalian pada transaksi yang dipilih.
+
+Dengan demikian, halaman ini berfungsi sebagai daftar transaksi aktif sekaligus menyediakan akses untuk memproses pengembalian.
+
+### 4.2 `proses_kembali.php`: Memproses Pengembalian
+File `proses_kembali.php` digunakan untuk memproses transaksi pengembalian dan mengembalikan stok buku.
+Proses yang ditambahkan meliputi:
+* Memastikan pengguna sudah login melalui `auth.php`.
+* Memastikan request menggunakan method `POST`.
+* Memverifikasi CSRF token.
+* Mengambil ID transaksi yang akan dikembalikan.
+* Memulai database transaction.
+* Mengunci baris transaksi menggunakan `FOR UPDATE`.
+* Memastikan transaksi masih memiliki status `dipinjam`.
+* Mengubah status transaksi menjadi `dikembalikan`.
+* Mengisi `tanggal_kembali` dengan tanggal saat pengembalian dilakukan.
+* Menambah stok buku sebanyak 1.
+* Menyimpan seluruh perubahan menggunakan `commit()`.
+* Membatalkan seluruh perubahan dengan `rollBack()` jika terjadi error.
+
+### 4.3 Transaction pada Pengembalian
+Database transaction digunakan karena pengembalian melakukan dua perubahan yang harus berhasil secara bersamaan:
+1. Mengubah status transaksi menjadi `dikembalikan` dan mengisi tanggal kembali.
+2. Menambah stok buku sebanyak 1.
+
+**Fungsinya:** menjaga agar data transaksi dan stok buku tetap konsisten.
+Jika perubahan transaksi berhasil tetapi penambahan stok gagal, transaction akan di-`rollback` sehingga perubahan sebelumnya juga dibatalkan.
+
+### 4.4 `FOR UPDATE` untuk Mencegah Pengembalian Ganda
+Pada proses penembalian, `FOR UPDATE` digunakan untuk mengunci baris transaksi peminjaman, bukan baris buku.
+**Fungsinya:** mencegah dua proses pengembalian terhadap transaksi yang sama berjalan secara bersamaan.
+Contohnya, jika tombol "Kembalikan" ditekan dua kali dengan cepat, kedua request tidak boleh sama-sama menganggap transaksi masih berstatus `dipinjam`. Penguncian memastikan proses kedua menunggu hingga transaction pertama selesai.
+
+### 4.5 Pemeriksaan Status Transaksi
+Sistem memeriksa status transaksi sebelum melakukan pengembalian.
+Jika transaksi tidak ditemukan atau statusnya sudah bukan `dipinjam`, proses akan dihentikan.
+**Fungsinya:** mencegah satu transaksi dikembalikan lebih dari satu kali. Hal ini penting agar stok buku tidak bertambah dua kali untuk satu pengembalian.
+
+### 4.6 Mengubah Status dan Tanggal Pengembalian
+Ketika pengembalian berhasil, status transaksi diubah menjadi `dikembalikan` dan `tanggal_kembali` diisi dengan tanggal saat proses dilakukan.
+**Fungsinya:**
+* `status` menunjukkan bahwa buku sudah dikembalikan.
+* `tanggal_kembali` mencatat kapan buku dikembalikan.
+
+Kedua data tersebut diperbarui dalam satu perintah sehingga informasi transaksi tetap konsisten.
+
+### 4.7 Menambah Kembali Stok Buku
+Setelah status peminjaman diperbarui, stok buku ditambah sebanyak 1.
+**Fungsinya:** mengembalikan jumlah buku yang tersedia setelah buku dikembalikan oleh anggota.
+Perubahan stok dilakukan dalam transaction yang sama dengan perubahan status peminjaman sehingga kedua proses berhasil atau dibatalkan secara bersamaan.
+
+### 4.8 Guard Method dan CSRF
+Proses pengembalian menggunakan dua lapisan keamanan, yaitu pemeriksaan HTTP method dan CSRF token.
+* **Pemeriksaan `POST`**: memastikan proses pengembalian tidak dapat dijalankan melalui request `GET`.
+* **CSRF token**: memastikan request berasal dari form aplikasi yang valid.
+* **Keduanya digunakan bersama**: masing-masing memberikan perlindungan yang berbeda.
+
+Pendekatan menggunakan beberapa lapisan keamanan ini disebut **defense in depth**, yaitu tidak bergantung pada satu mekanisme keamanan saja.
+
+## Ringkasan Perubahan 
+- Tambah `sql/03_peminjaman.sql` — tabel `peminjaman` (relasi ke `buku` dan `anggota`), melengkapi ERD yang sudah dirancang di Jobsheet 8.
+- Tambah modul **Peminjaman** (menghubungkan seluruh entitas yang sudah dibangun sejak Jobsheet 8-10 sekaligus):
+  - `peminjaman/tambah.php` + `proses_tambah.php`: pilih anggota + buku (dropdown hanya `stok > 0`), simpan transaksi **dan** kurangi stok buku dalam satu **transaction** (`beginTransaction`/`commit`/`rollBack`) dengan `SELECT ... FOR UPDATE` untuk mencegah race condition stok.
+  - `peminjaman/kembali.php` + `proses_kembali.php`: daftar transaksi aktif (`status = 'dipinjam'`), tombol Kembalikan menambah kembali stok buku dalam transaction serupa.
+  - `peminjaman/riwayat.php`: histori peminjaman per anggota (JOIN `peminjaman` + `buku`).
+- `includes/header.php`: navbar menambahkan menu Peminjaman Baru, Pengembalian, Riwayat (hanya saat login).
+- `index.php`: kartu "Sedang Dipinjam" kini `COUNT(*) FROM peminjaman WHERE status = 'dipinjam'` (sebelumnya statis `0`).
