@@ -7,4 +7,7 @@ function csrf_token()
     return $_SESSION['csrf_token'];
 }
 
-
+function csrf_field()
+{
+    return '<input type="hidden" name="csrf_token" value="' . csrf_token() . '">';
+}
