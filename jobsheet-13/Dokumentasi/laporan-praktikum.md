@@ -18,3 +18,17 @@ Cara tersebut dapat digunakan untuk pengembangan lokal, tetapi kurang fleksibel 
 Solusi yang diterapkan adalah memisahkan konfigurasi database ke dalam file includes/config.php dan menggunakan environment variable untuk membaca nilai konfigurasi dari lingkungan tempat aplikasi dijalankan.
 
 Dengan pendekatan ini, file config.php bertanggung jawab menyediakan nilai konfigurasi, sedangkan koneksi.php bertanggung jawab membuat koneksi database menggunakan PDO.
+
+## 02 Config & Koneksi
+### 2.1 Tujuan
+bertujuan untuk membuat file konfigurasi terpisah yang menyimpan parameter koneksi database. File tersebut menggunakan fungsi getenv() untuk membaca environment variable dan menyediakan nilai cadangan apabila variabel belum diatur.
+### 2.2 Implementasi Config.php
+Membuat File Config.php, penjelasan kode sbb: 
+1. getenv('DB_HOST') digunakan untuk membaca environment variable yang berisi alamat host database.
+2. getenv('DB_PORT') digunakan untuk membaca port PostgreSQL.
+3. getenv('DB_NAME') digunakan untuk membaca nama database.
+4. getenv('DB_USER') dan getenv('DB_PASS') digunakan untuk membaca username dan password database.
+5. Operator ?: menyediakan nilai cadangan apabila hasil pembacaan environment variable bernilai falsy, misalnya false atau string kosong.
+6. Pernyataan return mengembalikan konfigurasi dalam bentuk array asosiatif agar dapat digunakan oleh file PHP lainnya.
+
+File includes/config.php berhasil dibuat sebagai tempat pengaturan konfigurasi database. Nilai cadangan disesuaikan dengan konfigurasi pengembangan lokal SIMPUS-Mini, yaitu database simpus_mini dengan username postgres-1.
