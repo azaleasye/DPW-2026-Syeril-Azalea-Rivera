@@ -1,13 +1,23 @@
 <?php
-$config = require __DIR__.'/config.php';
 
-try{
+$config = require __DIR__ . '/config.php';
+
+try {
+    $dsn = "pgsql:host={$config['db_host']};"
+         . "port={$config['db_port']};"
+         . "dbname={$config['db_name']};"
+         . "sslmode=require";
+
     $pdo = new PDO(
-        "psql:host={config['db_host']};port={$config['db_port']};db_name={$config['db_name']}",
+        $dsn,
         $config['db_user'],
-        $config['db_pass']
+        $config['db_pass'],
+        [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]
     );
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    die("Koneksi database gagal: " . $e->getMessage());
+    error_log($e->getMessage());
+    die("Koneksi database gagal.");
 }
