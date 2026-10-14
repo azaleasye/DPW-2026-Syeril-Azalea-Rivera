@@ -20,10 +20,11 @@ Solusi yang diterapkan adalah memisahkan konfigurasi database ke dalam file incl
 Dengan pendekatan ini, file config.php bertanggung jawab menyediakan nilai konfigurasi, sedangkan koneksi.php bertanggung jawab membuat koneksi database menggunakan PDO.
 
 ## 02 Config & Koneksi
-### 2.1 Tujuan
+### 2.1 Tujuan config.php
 bertujuan untuk membuat file konfigurasi terpisah yang menyimpan parameter koneksi database. File tersebut menggunakan fungsi getenv() untuk membaca environment variable dan menyediakan nilai cadangan apabila variabel belum diatur.
-### 2.2 Implementasi Config.php
-Membuat File Config.php, penjelasan kode sbb: 
+
+### 2.2 Implementasi config.php
+Membuat File config.php, penjelasan kode sbb: 
 1. getenv('DB_HOST') digunakan untuk membaca environment variable yang berisi alamat host database.
 2. getenv('DB_PORT') digunakan untuk membaca port PostgreSQL.
 3. getenv('DB_NAME') digunakan untuk membaca nama database.
@@ -32,3 +33,16 @@ Membuat File Config.php, penjelasan kode sbb:
 6. Pernyataan return mengembalikan konfigurasi dalam bentuk array asosiatif agar dapat digunakan oleh file PHP lainnya.
 
 File includes/config.php berhasil dibuat sebagai tempat pengaturan konfigurasi database. Nilai cadangan disesuaikan dengan konfigurasi pengembangan lokal SIMPUS-Mini, yaitu database simpus_mini dengan username postgres-1.
+
+### 2.3 Tujuan koneksi.php
+Bertujuan untuk mengubah mekanisme koneksi database agar tidak lagi mengambil nilai host, port, nama database, username, dan password secara langsung dari variabel yang ditulis di dalam file koneksi.
+
+### 2.4 Implementasi koneksi.php
+Mengedit file koneksi.php, penjelasan kode sbb: 
+1. $config = require __DIR__ . '/config.php'; digunakan untuk memuat file konfigurasi dan menyimpan array yang dikembalikan ke variabel $config.
+2. __DIR__ menunjukkan direktori tempat file koneksi.php berada sehingga pemanggilan config.php tidak bergantung pada direktori kerja saat ini.
+3. new PDO() digunakan untuk membuat koneksi ke database PostgreSQL berdasarkan konfigurasi yang telah dibaca.
+4. PDO::ATTR_ERRMODE dengan nilai PDO::ERRMODE_EXCEPTION membuat PDO melempar exception ketika terjadi kesalahan.
+5. Blok try-catch digunakan untuk menangani kegagalan koneksi database.
+
+File koneksi.php telah menggunakan konfigurasi dari config.php. Dengan perubahan ini, pengaturan koneksi dan proses pembuatan koneksi mempunyai tanggung jawab yang terpisah, sehingga konfigurasi dapat diubah tanpa mengedit bagian utama kode koneksi.
